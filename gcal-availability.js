@@ -52,12 +52,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 events: function (info, successCallback, failureCallback) {
                     var startDate = info.startStr.slice(0, 10); // "2025-10-27"
                     var endDate = info.endStr.slice(0, 10);     // "2025-12-08"
+                    var currentView = calendar.view.type;
 
                     var url = GcalAvailability.restUrl
                         + '?start=' + encodeURIComponent(startDate)
-                        + '&end=' + encodeURIComponent(endDate);
+                        + '&end=' + encodeURIComponent(endDate)
+                        + '&view=' + encodeURIComponent(currentView);
 
-                    console.log('GCal Availability: fetching', url);
+                    console.log('GCal Availability: fetching', url, 'for view:', currentView);
 
                     fetch(url, {
                         method: 'GET',
@@ -81,20 +83,43 @@ document.addEventListener('DOMContentLoaded', function () {
                                 throw new Error(data.error);
                             }
 
-                            console.log('GCal Availability: busyBlocks from API', data);
+                            console.log('GCal Availability: data from API', data);
 
-                            // Map busy blocks to FullCalendar events
-                            var events = (data || []).map(function (block) {
-                                return {
-                                    title: GcalAvailability.i18n.busy || 'Obsazeno',
-                                    start: block.start,
-                                    end: block.end,
-                                    backgroundColor: '#ef4444',
-                                    borderColor: '#dc2626',
-                                    textColor: '#ffffff',
-                                    display: 'block'
-                                };
-                            });
+                            var events = [];
+
+                            // Month view: show day-level availability
+                            if (currentView === 'dayGridMonth') {
+                                events = (data || []).map(function (day) {
+                                    return {
+                                        title: day.available ? '✓ Available' : '✗ Full',
+                                        start: day.date,
+                                        end: day.date,
+                                        allDay: true,
+                                        backgroundColor: day.available ? '#10b981' : '#ef4444',
+                                        borderColor: day.available ? '#059669' : '#dc2626',
+                                        textColor: '#ffffff',
+                                        display: 'background',
+                                        extendedProps: {
+                                            bookedSlots: day.bookedSlots,
+                                            totalSlots: day.totalSlots
+                                        }
+                                    };
+                                });
+                            }
+                            // Week/Day view: show actual busy blocks
+                            else {
+                                events = (data || []).map(function (block) {
+                                    return {
+                                        title: GcalAvailability.i18n.busy || 'Busy',
+                                        start: block.start,
+                                        end: block.end,
+                                        backgroundColor: '#ef4444',
+                                        borderColor: '#dc2626',
+                                        textColor: '#ffffff',
+                                        display: 'block'
+                                    };
+                                });
+                            }
 
                             console.log('GCal Availability: events passed to FullCalendar', events);
 

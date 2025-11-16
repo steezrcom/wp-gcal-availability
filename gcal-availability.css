@@ -5,7 +5,7 @@
 
 /* Calendar container */
 #gcal-availability-calendar {
-    max-width: 100%;
+    max-width: 900px;
     margin: 0 auto;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
@@ -50,6 +50,32 @@
 .gcal-busy-event {
     cursor: default;
     font-weight: 500;
+}
+
+/* Month view day backgrounds */
+.fc-daygrid-day {
+    position: relative;
+}
+
+/* Available day (green) */
+.fc-daygrid-day.fc-day-available {
+    background-color: rgba(16, 185, 129, 0.1);
+}
+
+/* Full day (red) */
+.fc-daygrid-day.fc-day-full {
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #gcal-availability-calendar {
+        font-size: 14px;
+    }
+
+    .fc-toolbar-title {
+        font-size: 1.2em !important;
+    }
 }
 
 /* FullCalendar overrides for better appearance */

@@ -35,6 +35,7 @@ final class Gcal_Availability {
             'ical_url' => '',
             'cache_duration' => 300,
             'enable_logging' => false,
+            'daily_slots' => 1,
         ];
 
         $settings = get_option(self::OPTION_NAME, $defaults);
@@ -86,6 +87,11 @@ final class Gcal_Availability {
                         },
                         'sanitize_callback' => 'sanitize_text_field',
                     ],
+                    'view' => [
+                        'required'          => false,
+                        'default'           => 'dayGridMonth',
+                        'sanitize_callback' => 'sanitize_text_field',
+                    ],
                 ],
             ]
         );
@@ -133,6 +139,7 @@ final class Gcal_Availability {
 
         $start = sanitize_text_field($request->get_param('start'));
         $end   = sanitize_text_field($request->get_param('end'));
+        $view  = sanitize_text_field($request->get_param('view'));
 
         // Validate iCal URL is configured
         $icalUrl = $this->get_ical_url();
@@ -165,9 +172,13 @@ final class Gcal_Availability {
             );
         }
 
-        // We treat every event as a busy block
-        $busyBlocks = [];
+        // For month view, return day-level availability status
+        if ($view === 'dayGridMonth') {
+            return $this->get_month_view_data($events, $start, $end);
+        }
 
+        // For week/day views, return busy blocks as before
+        $busyBlocks = [];
         foreach ($events as $event) {
             $busyBlocks[] = [
                 'start' => $event['start'],
@@ -176,6 +187,59 @@ final class Gcal_Availability {
         }
 
         return $busyBlocks;
+    }
+
+    /**
+     * Get month view data - returns day-level availability
+     */
+    private function get_month_view_data(array $events, string $start, string $end): array {
+        $settings = $this->get_settings();
+        $dailySlots = $settings['daily_slots'] ?? 1;
+
+        // Count events per day
+        $eventsByDay = [];
+        foreach ($events as $event) {
+            $eventStart = new DateTime($event['start']);
+            $eventEnd = new DateTime($event['end']);
+
+            // For all-day events or events spanning multiple days
+            $currentDate = clone $eventStart;
+            $currentDate->setTime(0, 0, 0);
+            $endDate = clone $eventEnd;
+            $endDate->setTime(0, 0, 0);
+
+            while ($currentDate <= $endDate) {
+                $dayKey = $currentDate->format('Y-m-d');
+                if (!isset($eventsByDay[$dayKey])) {
+                    $eventsByDay[$dayKey] = 0;
+                }
+                $eventsByDay[$dayKey]++;
+                $currentDate->modify('+1 day');
+            }
+        }
+
+        // Generate day blocks with availability status
+        $dayBlocks = [];
+        $startDate = new DateTime($start);
+        $endDate = new DateTime($end);
+
+        $currentDate = clone $startDate;
+        while ($currentDate < $endDate) {
+            $dayKey = $currentDate->format('Y-m-d');
+            $bookedSlots = $eventsByDay[$dayKey] ?? 0;
+            $available = $bookedSlots < $dailySlots;
+
+            $dayBlocks[] = [
+                'date' => $dayKey,
+                'available' => $available,
+                'bookedSlots' => $bookedSlots,
+                'totalSlots' => $dailySlots,
+            ];
+
+            $currentDate->modify('+1 day');
+        }
+
+        return $dayBlocks;
     }
 
     /**
@@ -438,6 +502,14 @@ final class Gcal_Availability {
             'gcal-availability',
             'gcal_availability_main'
         );
+
+        add_settings_field(
+            'daily_slots',
+            __('Daily Availability Slots', 'gcal-availability'),
+            [$this, 'render_daily_slots_field'],
+            'gcal-availability',
+            'gcal_availability_main'
+        );
     }
 
     /**
@@ -458,6 +530,13 @@ final class Gcal_Availability {
         }
 
         $sanitized['enable_logging'] = isset($input['enable_logging']) && $input['enable_logging'] === '1';
+
+        if (isset($input['daily_slots'])) {
+            $sanitized['daily_slots'] = absint($input['daily_slots']);
+            if ($sanitized['daily_slots'] < 1) {
+                $sanitized['daily_slots'] = 1; // Minimum 1 slot
+            }
+        }
 
         return $sanitized;
     }
@@ -552,6 +631,20 @@ final class Gcal_Availability {
                    value="1" <?php checked($checked, true); ?>>
             <?php _e('Enable debug logging to error log', 'gcal-availability'); ?>
         </label>
+        <?php
+    }
+
+    public function render_daily_slots_field(): void {
+        $settings = $this->get_settings();
+        $value = $settings['daily_slots'] ?? 1;
+        ?>
+        <input type="number" name="<?php echo esc_attr(self::OPTION_NAME); ?>[daily_slots]"
+               value="<?php echo esc_attr($value); ?>"
+               min="1"
+               step="1">
+        <p class="description">
+            <?php _e('Number of available slots per day. Month view shows green when slots are available, red when all slots are booked.', 'gcal-availability'); ?>
+        </p>
         <?php
     }
 
