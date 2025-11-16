@@ -33,12 +33,13 @@ echo -e "${BLUE}Packaging files...${NC}"
 # Create zip with only necessary files
 zip -r "$OUTPUT_FILE" \
     gcal-availability.php \
-    gcal-availability.js \
-    gcal-availability.css \
     uninstall.php \
     readme.txt \
     README.md \
-    -x "*.git*" "*.DS_Store" "node_modules/*" "*.zip"
+    assets/ \
+    includes/ \
+    languages/ \
+    -x "*.git*" "*.DS_Store" "node_modules/*" "*.zip" "docs/*"
 
 echo ""
 if [ -f "$OUTPUT_FILE" ]; then

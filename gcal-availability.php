@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Google Calendar Availability
+ * Plugin Name: GCal Availability
  * Description: Reads a Google Calendar and exposes free busy blocks for a front end calendar.
  * Version: 1.1.0
  * Author: Your Name
@@ -691,7 +691,7 @@ final class Gcal_Availability {
 
         wp_enqueue_style(
             'gcal-availability',
-            plugins_url('gcal-availability.css', __FILE__),
+            plugins_url('assets/css/calendar.css', __FILE__),
             ['fullcalendar'],
             '1.1.0'
         );
@@ -706,7 +706,7 @@ final class Gcal_Availability {
 
         wp_enqueue_script(
             'gcal-availability',
-            plugins_url('gcal-availability.js', __FILE__),
+            plugins_url('assets/js/calendar.js', __FILE__),
             ['fullcalendar'],
             '1.1.0',
             true

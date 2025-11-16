@@ -119,12 +119,19 @@ GET /wp-json/gcal/v1/availability?start=2025-01-01&end=2025-01-31
 
 ```
 gcal-availability/
-├── gcal-availability.php    # Main plugin file
-├── gcal-availability.js     # Frontend JavaScript
-├── gcal-availability.css    # Custom styles
-├── uninstall.php           # Cleanup on uninstall
-├── readme.txt              # WordPress.org readme
-└── README.md               # Developer documentation
+├── assets/
+│   ├── css/
+│   │   └── calendar.css    # Calendar styles
+│   └── js/
+│       └── calendar.js     # Calendar JavaScript
+├── includes/               # PHP classes (future use)
+├── languages/              # Translation files
+├── docs/                   # Documentation
+├── gcal-availability.php   # Main plugin file
+├── uninstall.php          # Cleanup on uninstall
+├── readme.txt             # WordPress.org readme
+├── README.md              # Developer documentation
+└── package.sh             # Packaging script
 ```
 
 ### Requirements

@@ -47,8 +47,8 @@ This will:
 
 1. **Edit files:**
    - `gcal-availability.php` - Main plugin logic
-   - `gcal-availability.js` - Frontend calendar
-   - `gcal-availability.css` - Styling
+   - `assets/js/calendar.js` - Frontend calendar
+   - `assets/css/calendar.css` - Styling
 
 2. **Test locally:**
    - Install on local WordPress
@@ -118,22 +118,29 @@ Before deploying:
 
 ```
 gcal-availability/
-├── gcal-availability.php    # Main plugin file (required)
-├── gcal-availability.js     # Frontend JavaScript (required)
-├── gcal-availability.css    # Custom styles (required)
-├── uninstall.php           # Cleanup script (required)
-├── readme.txt              # WordPress.org format (required)
-├── README.md               # Developer docs
-├── package.sh              # Packaging script
-├── CHANGELOG.md            # Version history
-├── DEPLOY.md               # Deployment guide
-├── EXAMPLES.md             # Usage examples
-├── INSTALL.md              # Installation guide
-├── QUICK-START.md          # Quick setup
-└── .gitignore              # Git ignore rules
+├── assets/                  # Frontend assets
+│   ├── css/
+│   │   └── calendar.css    # Calendar styles
+│   └── js/
+│       └── calendar.js     # Calendar JavaScript
+├── includes/               # PHP classes (future use)
+├── languages/              # Translation files
+├── docs/                   # Documentation (not in package)
+│   ├── CHANGELOG.md
+│   ├── DEPLOY.md
+│   ├── DEVELOPMENT.md
+│   ├── EXAMPLES.md
+│   ├── INSTALL.md
+│   └── QUICK-START.md
+├── gcal-availability.php   # Main plugin file
+├── uninstall.php          # Cleanup script
+├── readme.txt             # WordPress.org format
+├── README.md              # Developer docs
+├── package.sh             # Packaging script
+└── .gitignore             # Git ignore rules
 ```
 
-**Required files for WordPress:** Only the first 5 files are required for the plugin to work.
+**Required files for WordPress:** Main PHP file, uninstall.php, assets/, readme.txt
 
 ---
 
