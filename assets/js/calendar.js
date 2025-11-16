@@ -52,6 +52,13 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         // Use events function directly instead of eventSources array
         events: function (info, successCallback, failureCallback) {
+                    // Safety check - info should always be defined
+                    if (!info || !info.startStr || !info.endStr) {
+                        console.error('GCal Availability: invalid info object', info);
+                        failureCallback(new Error('Invalid date range'));
+                        return;
+                    }
+
                     var startDate = info.startStr.slice(0, 10); // "2025-10-27"
                     var endDate = info.endStr.slice(0, 10);     // "2025-12-08"
                     // Get current view type - use tracked variable as fallback
