@@ -204,12 +204,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 timeRange: arg.event.extendedProps.timeRange
             });
 
-            // Month view: show time range or "Busy" for all-day, hide title
+            // Month view: show dot + time range or "Busy" for all-day
             if (view === 'dayGridMonth') {
-                // For all-day events, show just the title without dot
+                // For all-day events, show dot + "Obsazeno"
                 if (isAllDay) {
                     return {
-                        html: '<div class="fc-event-title">' + arg.event.extendedProps.timeRange + '</div>'
+                        html: '<div class="fc-daygrid-event-dot" style="border-color: ' + arg.borderColor + ';"></div>' +
+                              '<div class="fc-event-time">' + arg.event.extendedProps.timeRange + '</div>'
                     };
                 }
 
