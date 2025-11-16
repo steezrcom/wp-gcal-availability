@@ -62,6 +62,17 @@
     position: relative;
 }
 
+/* Availability color overlays - ensure they're visible */
+.fc-bg-event.gcal-available-day {
+    background-color: rgba(16, 185, 129, 0.5) !important;
+    opacity: 1 !important;
+}
+
+.fc-bg-event.gcal-full-day {
+    background-color: rgba(239, 68, 68, 0.5) !important;
+    opacity: 1 !important;
+}
+
 /* Make sure day numbers are visible on colored backgrounds */
 .fc .fc-daygrid-day-number {
     position: relative;

@@ -85,24 +85,31 @@ document.addEventListener('DOMContentLoaded', function () {
                             }
 
                             console.log('GCal Availability: data from API', data);
+                            console.log('GCal Availability: current view type:', currentView);
 
                             var events = [];
 
                             // Month view: show day-level availability (background color only)
                             if (currentView === 'dayGridMonth') {
+                                console.log('GCal Availability: processing MONTH view data');
                                 events = (data || []).map(function (day) {
+                                    console.log('GCal Availability: day', day.date, 'available:', day.available);
                                     return {
                                         start: day.date,
                                         allDay: true,
                                         display: 'background',
-                                        backgroundColor: day.available ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)',
-                                        borderColor: 'transparent'
+                                        // Higher opacity for better visibility on dark backgrounds
+                                        backgroundColor: day.available ? 'rgba(16, 185, 129, 0.5)' : 'rgba(239, 68, 68, 0.5)',
+                                        borderColor: 'transparent',
+                                        classNames: [day.available ? 'gcal-available-day' : 'gcal-full-day']
                                     };
                                 });
                             }
                             // Week/Day view: show actual busy blocks
                             else {
+                                console.log('GCal Availability: processing WEEK/DAY view data');
                                 events = (data || []).map(function (block) {
+                                    console.log('GCal Availability: busy block', block.start, 'to', block.end);
                                     return {
                                         title: GcalAvailability.i18n.busy || 'Busy',
                                         start: block.start,
@@ -115,6 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 });
                             }
 
+                            console.log('GCal Availability: total events created:', events.length);
                             console.log('GCal Availability: events passed to FullCalendar', events);
 
                             successCallback(events);
