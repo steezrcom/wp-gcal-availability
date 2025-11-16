@@ -19,7 +19,7 @@ VERSION=$(grep "Version:" gcal-availability.php | awk '{print $3}')
 echo -e "${YELLOW}Version:${NC} $VERSION"
 
 # Define output filename
-OUTPUT_FILE="gcal-availability-${VERSION}.zip"
+OUTPUT_FILE="gcal-availability.zip"
 
 # Remove old zip if exists
 if [ -f "$OUTPUT_FILE" ]; then
