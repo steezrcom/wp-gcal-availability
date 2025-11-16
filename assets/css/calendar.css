@@ -95,11 +95,37 @@
 
 /* Compact time slots in week/day views */
 .fc-timegrid-slot {
-    height: 2.5em !important;
+    height: 30px !important;  /* Compress to 30px (was 2.5em ~40px) */
+    min-height: 30px !important;
 }
 
 .fc-timegrid-slot-label {
     vertical-align: middle !important;
+    font-size: 0.85em;
+    padding: 0 4px !important;
+}
+
+/* Compress time axis */
+.fc-timegrid-axis {
+    width: 45px !important;
+}
+
+/* Reduce padding in time grid cells */
+.fc-timegrid-slot-lane {
+    border-top: 1px solid #e5e7eb;
+}
+
+/* Make events more compact */
+.fc-timegrid-event {
+    padding: 2px 4px !important;
+}
+
+.fc-timegrid-event .fc-event-time {
+    font-size: 0.85em;
+}
+
+.fc-timegrid-event .fc-event-title {
+    font-size: 0.9em;
 }
 
 /* Mobile responsive styles */
