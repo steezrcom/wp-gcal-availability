@@ -405,14 +405,24 @@ final class Gcal_Availability {
                 $insideEvent = false;
 
                 if (isset($current['DTSTART']) && isset($current['DTEND'])) {
+                    // Check if this is an all-day event (date only, no time)
+                    $isAllDay = strlen(trim($current['DTSTART'])) === 8 && ctype_digit(trim($current['DTSTART']));
+
                     $startUtc = $this->parse_ical_datetime($current['DTSTART'], $current['DTSTART_TZID'] ?? null);
                     $endUtc   = $this->parse_ical_datetime($current['DTEND'], $current['DTEND_TZID'] ?? null);
 
                     if ($startUtc && $endUtc) {
-                        $events[] = [
+                        $event = [
                             'start' => $startUtc,
                             'end'   => $endUtc,
                         ];
+
+                        // Add allDay flag if it's an all-day event
+                        if ($isAllDay) {
+                            $event['allDay'] = true;
+                        }
+
+                        $events[] = $event;
                     }
                 }
 
@@ -783,7 +793,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/css/calendar.css', __FILE__),
             ['fullcalendar'],
-            '1.2.8'
+            '1.3.0'
         );
 
         wp_enqueue_script(
@@ -798,7 +808,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/js/calendar.js', __FILE__),
             ['fullcalendar'],
-            '1.2.8',
+            '1.3.0',
             true
         );
 

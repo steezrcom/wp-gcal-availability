@@ -84,6 +84,15 @@
     cursor: pointer;
 }
 
+/* All-day events styling */
+.fc-daygrid-event.fc-event-start.fc-event-end {
+    /* Full block style for all-day events */
+}
+
+.fc-timegrid .fc-event.fc-event-start.fc-event-end {
+    /* All-day events in week/day view */
+}
+
 /* Compact time slots in week/day views */
 .fc-timegrid-slot {
     height: 2.5em !important;

@@ -109,26 +109,38 @@ document.addEventListener('DOMContentLoaded', function () {
 
                             // Simply show all events as busy blocks
                             var events = (data || []).map(function (block) {
-                                console.log('GCal Availability: busy block', block.start, 'to', block.end);
+                                console.log('GCal Availability: busy block', block.start, 'to', block.end, 'allDay:', block.allDay);
 
-                                // Format time range for display
-                                var startTime = new Date(block.start);
-                                var endTime = new Date(block.end);
-                                var startHour = startTime.getHours().toString().padStart(2, '0');
-                                var startMin = startTime.getMinutes().toString().padStart(2, '0');
-                                var endHour = endTime.getHours().toString().padStart(2, '0');
-                                var endMin = endTime.getMinutes().toString().padStart(2, '0');
-                                var timeRange = startHour + ':' + startMin + ' - ' + endHour + ':' + endMin;
+                                var timeRange;
+                                var title;
+
+                                // Handle all-day events differently
+                                if (block.allDay) {
+                                    timeRange = GcalAvailability.i18n.busy || 'Busy';
+                                    title = GcalAvailability.i18n.busy || 'Busy';
+                                } else {
+                                    // Format time range for display
+                                    var startTime = new Date(block.start);
+                                    var endTime = new Date(block.end);
+                                    var startHour = startTime.getHours().toString().padStart(2, '0');
+                                    var startMin = startTime.getMinutes().toString().padStart(2, '0');
+                                    var endHour = endTime.getHours().toString().padStart(2, '0');
+                                    var endMin = endTime.getMinutes().toString().padStart(2, '0');
+                                    timeRange = startHour + ':' + startMin + ' - ' + endHour + ':' + endMin;
+                                    title = GcalAvailability.i18n.busy || 'Busy';
+                                }
 
                                 return {
-                                    title: GcalAvailability.i18n.busy || 'Busy',
+                                    title: title,
                                     start: block.start,
                                     end: block.end,
+                                    allDay: block.allDay || false,
                                     backgroundColor: '#ef4444',
                                     borderColor: '#dc2626',
                                     textColor: '#ffffff',
                                     extendedProps: {
-                                        timeRange: timeRange
+                                        timeRange: timeRange,
+                                        isAllDay: block.allDay || false
                                     }
                                 };
                             });
@@ -168,16 +180,32 @@ document.addEventListener('DOMContentLoaded', function () {
         // Customize event content
         eventContent: function(arg) {
             var view = arg.view.type;
+            var isAllDay = arg.event.extendedProps.isAllDay;
 
-            // Month view: show time range, hide title
+            // Month view: show time range or "Busy" for all-day, hide title
             if (view === 'dayGridMonth') {
+                // For all-day events, show just the title without dot
+                if (isAllDay) {
+                    return {
+                        html: '<div class="fc-event-title">' + arg.event.extendedProps.timeRange + '</div>'
+                    };
+                }
+
+                // For timed events, show dot + time range
                 return {
                     html: '<div class="fc-daygrid-event-dot" style="border-color: ' + arg.borderColor + ';"></div>' +
                           '<div class="fc-event-time">' + arg.event.extendedProps.timeRange + '</div>'
                 };
             }
 
-            // Week/Day view: show title (Busy/Obsazeno) or nothing
+            // Week/Day view: for all-day events, show title only
+            if (isAllDay) {
+                return {
+                    html: '<div class="fc-event-title">' + (arg.event.title || '') + '</div>'
+                };
+            }
+
+            // Week/Day view: for timed events, show time + title
             return {
                 html: '<div class="fc-event-time">' + arg.timeText + '</div>' +
                       '<div class="fc-event-title">' + (arg.event.title || '') + '</div>'
