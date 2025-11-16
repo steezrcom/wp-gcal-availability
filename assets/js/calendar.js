@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Get opening hours from settings (passed from PHP)
     var openingStart = GcalAvailability.settings.openingHoursStart || '09:00';
     var openingEnd = GcalAvailability.settings.openingHoursEnd || '17:00';
+    var hideNonBusinessHours = GcalAvailability.settings.hideNonBusinessHours || false;
 
     // Check if hours cross midnight (e.g., 10:00 to 02:00 for nightclub)
     var startMinutes = timeToMinutes(openingStart);
@@ -67,6 +68,12 @@ document.addEventListener('DOMContentLoaded', function () {
         slotMaxTime = '24:00';
         console.log('GCal Availability: opening hours', openingStart, 'to', openingEnd,
                     '(crosses midnight - showing full day)');
+    } else if (hideNonBusinessHours) {
+        // Hide non-business hours: only show business hours (no buffer)
+        slotMinTime = openingStart;
+        slotMaxTime = openingEnd;
+        console.log('GCal Availability: opening hours', openingStart, 'to', openingEnd,
+                    '(hiding non-business hours)');
     } else {
         // Normal hours: show 1 hour before/after
         slotMinTime = subtractHour(openingStart);

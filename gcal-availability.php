@@ -49,6 +49,7 @@ final class Gcal_Availability {
             'enable_logging' => false,
             'opening_hours_start' => '09:00',
             'opening_hours_end' => '17:00',
+            'hide_non_business_hours' => false,
         ];
 
         $settings = get_option(self::OPTION_NAME, $defaults);
@@ -646,6 +647,14 @@ final class Gcal_Availability {
             'gcal-availability',
             'gcal_availability_main'
         );
+
+        add_settings_field(
+            'hide_non_business_hours',
+            __('Hide Non-Business Hours', 'gcal-availability'),
+            [$this, 'render_hide_non_business_hours_field'],
+            'gcal-availability',
+            'gcal_availability_main'
+        );
     }
 
     /**
@@ -675,6 +684,8 @@ final class Gcal_Availability {
         if (isset($input['opening_hours_end'])) {
             $sanitized['opening_hours_end'] = $this->sanitize_time($input['opening_hours_end'], '17:00');
         }
+
+        $sanitized['hide_non_business_hours'] = isset($input['hide_non_business_hours']) && $input['hide_non_business_hours'] === '1';
 
         return $sanitized;
     }
@@ -806,6 +817,21 @@ final class Gcal_Availability {
         <?php
     }
 
+    public function render_hide_non_business_hours_field(): void {
+        $settings = $this->get_settings();
+        $value = $settings['hide_non_business_hours'] ?? false;
+        ?>
+        <label>
+            <input type="checkbox" name="<?php echo esc_attr(self::OPTION_NAME); ?>[hide_non_business_hours]"
+                   value="1" <?php checked($value, true); ?>>
+            <?php _e('Completely hide non-business hours in week/day views (only show business hours)', 'gcal-availability'); ?>
+        </label>
+        <p class="description">
+            <?php _e('When enabled, the calendar will only display business hours instead of showing the full day. This makes the calendar more compact. Note: For midnight-crossing hours, this setting is ignored and the full day is shown.', 'gcal-availability'); ?>
+        </p>
+        <?php
+    }
+
     /**
      * Clear all plugin caches
      */
@@ -851,7 +877,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/css/calendar.css', __FILE__),
             ['fullcalendar'],
-            '1.6.1'
+            '1.7.0'
         );
 
         wp_enqueue_script(
@@ -866,7 +892,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/js/calendar.js', __FILE__),
             ['fullcalendar'],
-            '1.6.1',
+            '1.7.0',
             true
         );
 
@@ -880,6 +906,7 @@ final class Gcal_Availability {
                 'settings' => [
                     'openingHoursStart' => $settings['opening_hours_start'] ?? '09:00',
                     'openingHoursEnd' => $settings['opening_hours_end'] ?? '17:00',
+                    'hideNonBusinessHours' => $settings['hide_non_business_hours'] ?? false,
                 ],
                 'i18n' => [
                     'loading' => __('Loading calendar...', 'gcal-availability'),
