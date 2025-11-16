@@ -111,12 +111,15 @@ document.addEventListener('DOMContentLoaded', function () {
                                 var timeRange = startHour + ':' + startMin + ' - ' + endHour + ':' + endMin;
 
                                 return {
-                                    title: '❌ ' + timeRange,
+                                    title: GcalAvailability.i18n.busy || 'Busy',
                                     start: block.start,
                                     end: block.end,
                                     backgroundColor: '#ef4444',
                                     borderColor: '#dc2626',
-                                    textColor: '#ffffff'
+                                    textColor: '#ffffff',
+                                    extendedProps: {
+                                        timeRange: timeRange
+                                    }
                                 };
                             });
 
@@ -152,6 +155,25 @@ document.addEventListener('DOMContentLoaded', function () {
         eventClassNames: 'gcal-busy-event',
         dayMaxEvents: true,
         nowIndicator: true,
+        // Customize event content
+        eventContent: function(arg) {
+            var view = arg.view.type;
+
+            // Month view: show time range, hide title
+            if (view === 'dayGridMonth') {
+                return {
+                    html: '<div class="fc-daygrid-event-dot" style="border-color: ' + arg.borderColor + ';"></div>' +
+                          '<div class="fc-event-time">' + arg.event.extendedProps.timeRange + '</div>'
+                };
+            }
+
+            // Week/Day view: show title (Busy/Obsazeno) or nothing
+            return {
+                html: '<div class="fc-event-time">' + arg.timeText + '</div>' +
+                      '<div class="fc-event-title">' + (arg.event.title || '') + '</div>'
+            };
+        },
+
         // Responsive
         windowResize: function() {
             calendar.updateSize();
