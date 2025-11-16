@@ -1,0 +1,26 @@
+# Czech translation for GCal Availability
+# Copyright (C) 2024
+# This file is distributed under the same license as the GCal Availability package.
+msgid ""
+msgstr ""
+"Project-Id-Version: GCal Availability 1.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-11-16 12:00+0000\n"
+"PO-Revision-Date: 2024-11-16 12:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Czech\n"
+"Language: cs_CZ\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+
+msgid "Loading calendar..."
+msgstr "Načítání kalendáře..."
+
+msgid "Failed to load calendar. Please try again later."
+msgstr "Nepodařilo se načíst kalendář. Zkuste to prosím později."
+
+msgid "Busy"
+msgstr "Obsazeno"
+

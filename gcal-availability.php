@@ -20,11 +20,23 @@ final class Gcal_Availability {
     private const MAX_REQUESTS_PER_MINUTE = 30;
 
     public function __construct() {
+        add_action('plugins_loaded', [$this, 'load_textdomain']);
         add_action('rest_api_init', [$this, 'register_rest_routes']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
         add_action('admin_menu', [$this, 'add_admin_menu']);
         add_action('admin_init', [$this, 'register_settings']);
         add_shortcode('gcal_availability_calendar', [$this, 'render_calendar_shortcode']);
+    }
+
+    /**
+     * Load plugin text domain for translations
+     */
+    public function load_textdomain(): void {
+        load_plugin_textdomain(
+            'gcal-availability',
+            false,
+            dirname(plugin_basename(__FILE__)) . '/languages'
+        );
     }
 
     /**
@@ -771,7 +783,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/css/calendar.css', __FILE__),
             ['fullcalendar'],
-            '1.2.0'
+            '1.2.1'
         );
 
         wp_enqueue_script(
@@ -786,7 +798,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/js/calendar.js', __FILE__),
             ['fullcalendar'],
-            '1.2.0',
+            '1.2.1',
             true
         );
 

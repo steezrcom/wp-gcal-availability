@@ -100,8 +100,18 @@ document.addEventListener('DOMContentLoaded', function () {
                             // Simply show all events as busy blocks
                             var events = (data || []).map(function (block) {
                                 console.log('GCal Availability: busy block', block.start, 'to', block.end);
+
+                                // Format time range for display
+                                var startTime = new Date(block.start);
+                                var endTime = new Date(block.end);
+                                var startHour = startTime.getHours().toString().padStart(2, '0');
+                                var startMin = startTime.getMinutes().toString().padStart(2, '0');
+                                var endHour = endTime.getHours().toString().padStart(2, '0');
+                                var endMin = endTime.getMinutes().toString().padStart(2, '0');
+                                var timeRange = startHour + ':' + startMin + ' - ' + endHour + ':' + endMin;
+
                                 return {
-                                    title: block.title || GcalAvailability.i18n.busy || 'Busy',
+                                    title: '❌ ' + timeRange,
                                     start: block.start,
                                     end: block.end,
                                     backgroundColor: '#ef4444',
