@@ -180,7 +180,17 @@ document.addEventListener('DOMContentLoaded', function () {
         // Customize event content
         eventContent: function(arg) {
             var view = arg.view.type;
-            var isAllDay = arg.event.extendedProps.isAllDay;
+            // Check both our custom flag and FullCalendar's native allDay property
+            var isAllDay = arg.event.extendedProps.isAllDay || arg.event.allDay;
+
+            console.log('Event content:', {
+                title: arg.event.title,
+                view: view,
+                isAllDay: isAllDay,
+                fcAllDay: arg.event.allDay,
+                customAllDay: arg.event.extendedProps.isAllDay,
+                timeRange: arg.event.extendedProps.timeRange
+            });
 
             // Month view: show time range or "Busy" for all-day, hide title
             if (view === 'dayGridMonth') {
