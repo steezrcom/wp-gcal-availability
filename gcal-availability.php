@@ -851,7 +851,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/css/calendar.css', __FILE__),
             ['fullcalendar'],
-            '1.4.1'
+            '1.5.0'
         );
 
         wp_enqueue_script(
@@ -866,15 +866,21 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/js/calendar.js', __FILE__),
             ['fullcalendar'],
-            '1.4.1',
+            '1.5.0',
             true
         );
+
+        $settings = $this->get_settings();
 
         wp_localize_script(
             'gcal-availability',
             'GcalAvailability',
             [
                 'restUrl' => esc_url_raw(rest_url('gcal/v1/availability')),
+                'settings' => [
+                    'openingHoursStart' => $settings['opening_hours_start'] ?? '09:00',
+                    'openingHoursEnd' => $settings['opening_hours_end'] ?? '17:00',
+                ],
                 'i18n' => [
                     'loading' => __('Loading calendar...', 'gcal-availability'),
                     'error' => __('Failed to load calendar. Please try again later.', 'gcal-availability'),

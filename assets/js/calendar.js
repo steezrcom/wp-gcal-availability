@@ -1,3 +1,19 @@
+// Helper function to subtract an hour from a time string (HH:MM)
+function subtractHour(timeStr) {
+    var parts = timeStr.split(':');
+    var hour = parseInt(parts[0], 10);
+    hour = hour > 0 ? hour - 1 : 0;
+    return hour.toString().padStart(2, '0') + ':' + parts[1];
+}
+
+// Helper function to add an hour to a time string (HH:MM)
+function addHour(timeStr) {
+    var parts = timeStr.split(':');
+    var hour = parseInt(parts[0], 10);
+    hour = hour < 23 ? hour + 1 : 23;
+    return hour.toString().padStart(2, '0') + ':' + parts[1];
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     var element = document.getElementById('gcal-availability-calendar');
 
@@ -17,6 +33,17 @@ document.addEventListener('DOMContentLoaded', function () {
     var initialView = element.getAttribute('data-initial-view') || 'dayGridMonth';
     var locale = element.getAttribute('data-locale') || 'cs';
     var firstDay = parseInt(element.getAttribute('data-first-day') || '1', 10);
+
+    // Get opening hours from settings (passed from PHP)
+    var openingStart = GcalAvailability.settings.openingHoursStart || '09:00';
+    var openingEnd = GcalAvailability.settings.openingHoursEnd || '17:00';
+
+    // Calculate slot times (1 hour before opening, 1 hour after closing)
+    var slotMinTime = subtractHour(openingStart);
+    var slotMaxTime = addHour(openingEnd);
+
+    console.log('GCal Availability: opening hours', openingStart, 'to', openingEnd);
+    console.log('GCal Availability: slot times', slotMinTime, 'to', slotMaxTime);
 
     // Show loading state
     element.innerHTML = '<div class="gcal-loading" style="padding: 40px; text-align: center; color: #666;">' +
@@ -43,11 +70,11 @@ document.addEventListener('DOMContentLoaded', function () {
         // Show only business hours in week/day views
         businessHours: {
             daysOfWeek: [1, 2, 3, 4, 5, 6, 0], // Monday - Sunday
-            startTime: '09:00',
-            endTime: '17:00'
+            startTime: openingStart,
+            endTime: openingEnd
         },
-        slotMinTime: '08:00',
-        slotMaxTime: '20:00',
+        slotMinTime: slotMinTime,
+        slotMaxTime: slotMaxTime,
         slotDuration: '01:00',
         slotLabelInterval: '01:00',
 
