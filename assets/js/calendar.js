@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                         start: day.date,
                                         allDay: true,
                                         display: 'background',
-                                        backgroundColor: day.available ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                                        backgroundColor: day.available ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)',
                                         borderColor: 'transparent'
                                     };
                                 });

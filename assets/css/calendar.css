@@ -10,6 +10,11 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
+/* Make calendar adapt to site background */
+#gcal-availability-calendar .fc {
+    background: transparent;
+}
+
 /* Loading state */
 .gcal-loading {
     padding: 40px;
@@ -61,24 +66,26 @@
 .fc .fc-daygrid-day-number {
     position: relative;
     z-index: 2;
-    color: #111827;
+    color: inherit;
     font-weight: 600;
+    padding: 8px;
 }
 
 /* Today styling - make it stand out */
 .fc .fc-daygrid-day.fc-day-today {
-    background-color: #dbeafe !important;
+    background-color: rgba(59, 130, 246, 0.2) !important;
 }
 
 .fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
     background-color: #3b82f6;
     color: white;
     border-radius: 50%;
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    padding: 0;
 }
 
 /* Responsive adjustments */
@@ -96,13 +103,15 @@
 .fc {
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
 }
 
 .fc .fc-toolbar-title {
     font-size: 1.5em;
     font-weight: 600;
-    color: #111827;
+    color: inherit;
 }
 
 .fc .fc-button {
@@ -112,17 +121,20 @@
     font-weight: 500;
     padding: 0.5em 1em;
     transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .fc .fc-button:hover {
     background-color: #2563eb;
     border-color: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .fc .fc-button:disabled {
-    background-color: #9ca3af;
-    border-color: #9ca3af;
-    opacity: 0.6;
+    background-color: #6b7280;
+    border-color: #6b7280;
+    opacity: 0.5;
 }
 
 .fc .fc-button-primary:not(:disabled):active,
@@ -133,22 +145,33 @@
 
 .fc-theme-standard td,
 .fc-theme-standard th {
-    border-color: #e5e7eb;
+    border-color: rgba(255, 255, 255, 0.1);
 }
 
 .fc-theme-standard .fc-scrollgrid {
-    border-color: #e5e7eb;
+    border-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Day number styling is handled above */
 
 .fc .fc-col-header-cell {
-    background-color: #f9fafb;
+    background-color: rgba(255, 255, 255, 0.05);
     font-weight: 600;
     text-transform: uppercase;
     font-size: 0.75em;
     letter-spacing: 0.05em;
     padding: 12px 0;
+    color: inherit;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Day cells */
+.fc .fc-daygrid-day {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.fc .fc-daygrid-day:hover {
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 /* Event styling */
