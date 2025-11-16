@@ -84,6 +84,15 @@
     cursor: pointer;
 }
 
+/* Hide all-day row in week/day views since we convert all-day events to full-day timed blocks */
+.fc-timegrid .fc-scrollgrid-section-header {
+    display: none !important;
+}
+
+.fc-timegrid .fc-daygrid-body {
+    display: none !important;
+}
+
 /* All-day events styling */
 .fc-daygrid-event.fc-event-start.fc-event-end {
     /* Full block style for all-day events */
