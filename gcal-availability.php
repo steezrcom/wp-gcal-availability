@@ -789,7 +789,7 @@ final class Gcal_Availability {
         <input type="time" name="<?php echo esc_attr(self::OPTION_NAME); ?>[opening_hours_start]"
                value="<?php echo esc_attr($value); ?>">
         <p class="description">
-            <?php _e('Start time for availability checking (e.g., 09:00)', 'gcal-availability'); ?>
+            <?php _e('Start time for business hours (e.g., 09:00 or 22:00 for nightclub)', 'gcal-availability'); ?>
         </p>
         <?php
     }
@@ -801,7 +801,7 @@ final class Gcal_Availability {
         <input type="time" name="<?php echo esc_attr(self::OPTION_NAME); ?>[opening_hours_end]"
                value="<?php echo esc_attr($value); ?>">
         <p class="description">
-            <?php _e('End time for availability checking (e.g., 17:00). A day is available if there are at least 2 consecutive hours free.', 'gcal-availability'); ?>
+            <?php _e('End time for business hours (e.g., 17:00 or 02:00 for nightclub). Supports midnight crossing: if end time is earlier than start time (e.g., 22:00-02:00), the calendar will show the full 24-hour day with business hours highlighted across midnight.', 'gcal-availability'); ?>
         </p>
         <?php
     }
@@ -851,7 +851,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/css/calendar.css', __FILE__),
             ['fullcalendar'],
-            '1.5.0'
+            '1.6.0'
         );
 
         wp_enqueue_script(
@@ -866,7 +866,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/js/calendar.js', __FILE__),
             ['fullcalendar'],
-            '1.5.0',
+            '1.6.0',
             true
         );
 

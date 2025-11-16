@@ -1,17 +1,30 @@
+// Helper function to convert time string (HH:MM) to minutes since midnight
+function timeToMinutes(timeStr) {
+    var parts = timeStr.split(':');
+    return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+}
+
+// Helper function to convert minutes since midnight to time string (HH:MM)
+function minutesToTime(minutes) {
+    // Handle wrapping around midnight
+    minutes = minutes % (24 * 60);
+    if (minutes < 0) minutes += 24 * 60;
+
+    var hours = Math.floor(minutes / 60);
+    var mins = minutes % 60;
+    return hours.toString().padStart(2, '0') + ':' + mins.toString().padStart(2, '0');
+}
+
 // Helper function to subtract an hour from a time string (HH:MM)
 function subtractHour(timeStr) {
-    var parts = timeStr.split(':');
-    var hour = parseInt(parts[0], 10);
-    hour = hour > 0 ? hour - 1 : 0;
-    return hour.toString().padStart(2, '0') + ':' + parts[1];
+    var minutes = timeToMinutes(timeStr);
+    return minutesToTime(minutes - 60);
 }
 
 // Helper function to add an hour to a time string (HH:MM)
 function addHour(timeStr) {
-    var parts = timeStr.split(':');
-    var hour = parseInt(parts[0], 10);
-    hour = hour < 23 ? hour + 1 : 23;
-    return hour.toString().padStart(2, '0') + ':' + parts[1];
+    var minutes = timeToMinutes(timeStr);
+    return minutesToTime(minutes + 60);
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -38,11 +51,29 @@ document.addEventListener('DOMContentLoaded', function () {
     var openingStart = GcalAvailability.settings.openingHoursStart || '09:00';
     var openingEnd = GcalAvailability.settings.openingHoursEnd || '17:00';
 
-    // Calculate slot times (1 hour before opening, 1 hour after closing)
-    var slotMinTime = subtractHour(openingStart);
-    var slotMaxTime = addHour(openingEnd);
+    // Check if hours cross midnight (e.g., 10:00 to 02:00 for nightclub)
+    var startMinutes = timeToMinutes(openingStart);
+    var endMinutes = timeToMinutes(openingEnd);
+    var crossesMidnight = endMinutes < startMinutes;
 
-    console.log('GCal Availability: opening hours', openingStart, 'to', openingEnd);
+    // Calculate slot times
+    var slotMinTime, slotMaxTime;
+
+    if (crossesMidnight) {
+        // For midnight-crossing hours (e.g., 10:00-02:00), show full day
+        // This is the best approach since FullCalendar doesn't support
+        // slotMinTime/slotMaxTime crossing midnight
+        slotMinTime = '00:00';
+        slotMaxTime = '24:00';
+        console.log('GCal Availability: opening hours', openingStart, 'to', openingEnd,
+                    '(crosses midnight - showing full day)');
+    } else {
+        // Normal hours: show 1 hour before/after
+        slotMinTime = subtractHour(openingStart);
+        slotMaxTime = addHour(openingEnd);
+        console.log('GCal Availability: opening hours', openingStart, 'to', openingEnd);
+    }
+
     console.log('GCal Availability: slot times', slotMinTime, 'to', slotMaxTime);
 
     // Show loading state
@@ -68,7 +99,20 @@ document.addEventListener('DOMContentLoaded', function () {
             day: locale === 'cs' ? 'Den' : 'Day'
         },
         // Show only business hours in week/day views
-        businessHours: {
+        businessHours: crossesMidnight ? [
+            // For midnight-crossing hours (e.g., 10:00-02:00), split into two blocks
+            {
+                daysOfWeek: [1, 2, 3, 4, 5, 6, 0], // All days
+                startTime: openingStart,  // e.g., 10:00
+                endTime: '24:00'          // Until midnight
+            },
+            {
+                daysOfWeek: [1, 2, 3, 4, 5, 6, 0], // All days (next day)
+                startTime: '00:00',       // From midnight
+                endTime: openingEnd       // e.g., 02:00
+            }
+        ] : {
+            // Normal hours (e.g., 09:00-17:00)
             daysOfWeek: [1, 2, 3, 4, 5, 6, 0], // Monday - Sunday
             startTime: openingStart,
             endTime: openingEnd
