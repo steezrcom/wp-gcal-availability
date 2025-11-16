@@ -18,9 +18,6 @@ document.addEventListener('DOMContentLoaded', function () {
     var locale = element.getAttribute('data-locale') || 'cs';
     var firstDay = parseInt(element.getAttribute('data-first-day') || '1', 10);
 
-    // Track current view for event fetching
-    var currentCalendarView = initialView;
-
     // Show loading state
     element.innerHTML = '<div class="gcal-loading" style="padding: 40px; text-align: center; color: #666;">' +
         '<div style="font-size: 18px; margin-bottom: 10px;">⏳</div>' +
@@ -58,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log('GCal Availability: events loaded');
             }
         },
-        // Use events function directly instead of eventSources array
+        // Simple event source - just show busy blocks
         events: function (info, successCallback, failureCallback) {
                     // Safety check - info should always be defined
                     if (!info || !info.startStr || !info.endStr) {
@@ -67,17 +64,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         return;
                     }
 
-                    var startDate = info.startStr.slice(0, 10); // "2025-10-27"
-                    var endDate = info.endStr.slice(0, 10);     // "2025-12-08"
-                    // Get current view type - use tracked variable as fallback
-                    var viewType = (info.view && info.view.type) ? info.view.type : currentCalendarView;
+                    var startDate = info.startStr.slice(0, 10);
+                    var endDate = info.endStr.slice(0, 10);
 
                     var url = GcalAvailability.restUrl
                         + '?start=' + encodeURIComponent(startDate)
-                        + '&end=' + encodeURIComponent(endDate)
-                        + '&view=' + encodeURIComponent(viewType);
+                        + '&end=' + encodeURIComponent(endDate);
 
-                    console.log('GCal Availability: fetching', url, 'for view:', viewType);
+                    console.log('GCal Availability: fetching', url);
 
                     fetch(url, {
                         method: 'GET',
@@ -102,45 +96,21 @@ document.addEventListener('DOMContentLoaded', function () {
                             }
 
                             console.log('GCal Availability: data from API', data);
-                            console.log('GCal Availability: current view type:', viewType);
 
-                            var events = [];
+                            // Simply show all events as busy blocks
+                            var events = (data || []).map(function (block) {
+                                console.log('GCal Availability: busy block', block.start, 'to', block.end);
+                                return {
+                                    title: block.title || GcalAvailability.i18n.busy || 'Busy',
+                                    start: block.start,
+                                    end: block.end,
+                                    backgroundColor: '#ef4444',
+                                    borderColor: '#dc2626',
+                                    textColor: '#ffffff'
+                                };
+                            });
 
-                            // Month view: show day-level availability (background color only)
-                            if (viewType === 'dayGridMonth') {
-                                console.log('GCal Availability: processing MONTH view data');
-                                events = (data || []).map(function (day) {
-                                    console.log('GCal Availability: day', day.date, 'available:', day.available);
-                                    return {
-                                        start: day.date,
-                                        allDay: true,
-                                        display: 'background',
-                                        // Higher opacity for better visibility on dark backgrounds
-                                        backgroundColor: day.available ? 'rgba(16, 185, 129, 0.5)' : 'rgba(239, 68, 68, 0.5)',
-                                        borderColor: 'transparent',
-                                        classNames: [day.available ? 'gcal-available-day' : 'gcal-full-day']
-                                    };
-                                });
-                            }
-                            // Week/Day view: show actual busy blocks
-                            else {
-                                console.log('GCal Availability: processing WEEK/DAY view data');
-                                events = (data || []).map(function (block) {
-                                    console.log('GCal Availability: busy block', block.start, 'to', block.end);
-                                    return {
-                                        title: GcalAvailability.i18n.busy || 'Busy',
-                                        start: block.start,
-                                        end: block.end,
-                                        backgroundColor: '#ef4444',
-                                        borderColor: '#dc2626',
-                                        textColor: '#ffffff',
-                                        display: 'block'
-                                    };
-                                });
-                            }
-
-                            console.log('GCal Availability: total events created:', events.length);
-                            console.log('GCal Availability: events passed to FullCalendar', events);
+                            console.log('GCal Availability: total events:', events.length);
 
                             successCallback(events);
                         })
@@ -176,24 +146,7 @@ document.addEventListener('DOMContentLoaded', function () {
         windowResize: function() {
             calendar.updateSize();
         },
-        // Track view changes and clear events immediately
-        viewWillUnmount: function(info) {
-            console.log('GCal Availability: view will unmount:', info.view.type);
-            // Remove all events when switching views to prevent flash
-            calendar.removeAllEvents();
-        },
-        viewDidMount: function(info) {
-            console.log('GCal Availability: view mounted:', info.view.type);
-            // Update tracked view
-            var previousView = currentCalendarView;
-            currentCalendarView = info.view.type;
 
-            // Force refetch if view type changed
-            if (previousView !== currentCalendarView) {
-                console.log('GCal Availability: view type changed, refetching events');
-                calendar.refetchEvents();
-            }
-        }
     });
 
     try {

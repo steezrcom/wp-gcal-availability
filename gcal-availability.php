@@ -175,19 +175,15 @@ final class Gcal_Availability {
             );
         }
 
-        $this->log("View type: $view, returning " . ($view === 'dayGridMonth' ? 'month' : 'week/day') . " data", 'info');
+        $this->log("Returning busy blocks for all views", 'info');
 
-        // For month view, return day-level availability status
-        if ($view === 'dayGridMonth') {
-            return $this->get_month_view_data($events, $start, $end);
-        }
-
-        // For week/day views, return busy blocks as before
+        // Return busy blocks for all views
         $busyBlocks = [];
         foreach ($events as $event) {
             $busyBlocks[] = [
                 'start' => $event['start'],
                 'end'   => $event['end'],
+                'title' => 'Busy',
             ];
         }
 
@@ -775,7 +771,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/css/calendar.css', __FILE__),
             ['fullcalendar'],
-            '1.1.3'
+            '1.2.0'
         );
 
         wp_enqueue_script(
@@ -790,7 +786,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/js/calendar.js', __FILE__),
             ['fullcalendar'],
-            '1.1.4',
+            '1.2.0',
             true
         );
 

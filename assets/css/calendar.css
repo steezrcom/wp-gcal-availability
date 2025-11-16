@@ -62,17 +62,6 @@
     position: relative;
 }
 
-/* Availability color overlays - ensure they're visible */
-.fc-bg-event.gcal-available-day {
-    background-color: rgba(16, 185, 129, 0.5) !important;
-    opacity: 1 !important;
-}
-
-.fc-bg-event.gcal-full-day {
-    background-color: rgba(239, 68, 68, 0.5) !important;
-    opacity: 1 !important;
-}
-
 /* Business hours styling - make non-business hours darker/grayed out */
 .fc-non-business {
     background-color: rgba(0, 0, 0, 0.05) !important;
