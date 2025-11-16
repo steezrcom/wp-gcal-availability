@@ -414,22 +414,35 @@ final class Gcal_Availability {
                     // Debug logging
                     $this->log("Event DTSTART: " . $current['DTSTART'] . " (length: " . strlen(trim($current['DTSTART'])) . ", isAllDay: " . ($isAllDay ? 'true' : 'false') . ")");
 
-                    $startUtc = $this->parse_ical_datetime($current['DTSTART'], $current['DTSTART_TZID'] ?? null);
-                    $endUtc   = $this->parse_ical_datetime($current['DTEND'], $current['DTEND_TZID'] ?? null);
+                    if ($isAllDay) {
+                        // For all-day events, return date-only strings (YYYY-MM-DD format)
+                        // This prevents timezone conversion issues
+                        $startDate = $this->parse_ical_date_only($current['DTSTART']);
+                        $endDate   = $this->parse_ical_date_only($current['DTEND']);
 
-                    if ($startUtc && $endUtc) {
-                        $event = [
-                            'start' => $startUtc,
-                            'end'   => $endUtc,
-                        ];
+                        if ($startDate && $endDate) {
+                            $event = [
+                                'start' => $startDate,
+                                'end'   => $endDate,
+                                'allDay' => true,
+                            ];
 
-                        // Add allDay flag if it's an all-day event
-                        if ($isAllDay) {
-                            $event['allDay'] = true;
-                            $this->log("All-day event detected: {$startUtc} to {$endUtc}");
+                            $this->log("All-day event detected: {$startDate} to {$endDate}");
+                            $events[] = $event;
                         }
+                    } else {
+                        // For timed events, use full datetime with timezone
+                        $startUtc = $this->parse_ical_datetime($current['DTSTART'], $current['DTSTART_TZID'] ?? null);
+                        $endUtc   = $this->parse_ical_datetime($current['DTEND'], $current['DTEND_TZID'] ?? null);
 
-                        $events[] = $event;
+                        if ($startUtc && $endUtc) {
+                            $event = [
+                                'start' => $startUtc,
+                                'end'   => $endUtc,
+                            ];
+
+                            $events[] = $event;
+                        }
                     }
                 }
 
@@ -470,6 +483,35 @@ final class Gcal_Availability {
         }
 
         return $events;
+    }
+
+    /**
+     * Parse an iCal date-only value into YYYY-MM-DD format.
+     * Used for all-day events to avoid timezone conversion issues.
+     *
+     * @param string $value Date in format YYYYMMDD (e.g., 20251117)
+     * @return string|null Date in YYYY-MM-DD format (e.g., 2025-11-17)
+     */
+    private function parse_ical_date_only(string $value): ?string {
+        $value = trim($value);
+
+        // Check if it's a date-only value (8 digits)
+        if (strlen($value) !== 8 || !ctype_digit($value)) {
+            return null;
+        }
+
+        // Parse YYYYMMDD format
+        $year = substr($value, 0, 4);
+        $month = substr($value, 4, 2);
+        $day = substr($value, 6, 2);
+
+        // Validate date
+        if (!checkdate((int)$month, (int)$day, (int)$year)) {
+            return null;
+        }
+
+        // Return in YYYY-MM-DD format (FullCalendar's all-day format)
+        return "{$year}-{$month}-{$day}";
     }
 
     /**
@@ -802,7 +844,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/css/calendar.css', __FILE__),
             ['fullcalendar'],
-            '1.3.1'
+            '1.3.2'
         );
 
         wp_enqueue_script(
@@ -817,7 +859,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/js/calendar.js', __FILE__),
             ['fullcalendar'],
-            '1.3.1',
+            '1.3.2',
             true
         );
 
