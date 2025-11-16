@@ -52,7 +52,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 events: function (info, successCallback, failureCallback) {
                     var startDate = info.startStr.slice(0, 10); // "2025-10-27"
                     var endDate = info.endStr.slice(0, 10);     // "2025-12-08"
-                    var currentView = calendar.view.type;
+                    // Get current view type from info object instead of calendar
+                    var currentView = info.view ? info.view.type : 'dayGridMonth';
 
                     var url = GcalAvailability.restUrl
                         + '?start=' + encodeURIComponent(startDate)
