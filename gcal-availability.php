@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Google Calendar Availability
  * Description: Reads a Google Calendar and exposes free busy blocks for a front end calendar.
- * Version: 1.1.0
+ * Version: 1.1.1
  * Author: steezr
  * Text Domain: gcal-availability
  * Domain Path: /languages
