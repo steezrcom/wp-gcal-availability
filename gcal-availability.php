@@ -192,11 +192,18 @@ final class Gcal_Availability {
         // Return busy blocks for all views
         $busyBlocks = [];
         foreach ($events as $event) {
-            $busyBlocks[] = [
+            $block = [
                 'start' => $event['start'],
                 'end'   => $event['end'],
                 'title' => 'Busy',
             ];
+
+            // Include allDay flag if present
+            if (isset($event['allDay']) && $event['allDay']) {
+                $block['allDay'] = true;
+            }
+
+            $busyBlocks[] = $block;
         }
 
         return $busyBlocks;
@@ -844,7 +851,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/css/calendar.css', __FILE__),
             ['fullcalendar'],
-            '1.3.3'
+            '1.3.4'
         );
 
         wp_enqueue_script(
@@ -859,7 +866,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/js/calendar.js', __FILE__),
             ['fullcalendar'],
-            '1.3.3',
+            '1.3.4',
             true
         );
 
