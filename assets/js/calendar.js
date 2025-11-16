@@ -113,9 +113,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
                                 var timeRange;
                                 var title;
+                                var eventStart = block.start;
+                                var eventEnd = block.end;
+                                var isAllDay = block.allDay || false;
 
                                 // Handle all-day events differently
-                                if (block.allDay) {
+                                if (isAllDay) {
+                                    // For all-day events, convert to full-day timed event (00:00 to 23:59)
+                                    // This makes them appear as big blocks in week/day view instead of in the all-day row
+                                    var startDate = new Date(block.start);
+                                    var endDate = new Date(block.end);
+
+                                    // Set start to 00:00 of the start date
+                                    eventStart = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 0, 0, 0).toISOString();
+
+                                    // Set end to 23:59 of the day before the end date (since iCal end dates are exclusive)
+                                    endDate.setDate(endDate.getDate() - 1);
+                                    eventEnd = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 23, 59, 59).toISOString();
+
                                     timeRange = GcalAvailability.i18n.busy || 'Busy';
                                     title = GcalAvailability.i18n.busy || 'Busy';
                                 } else {
@@ -132,15 +147,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
                                 return {
                                     title: title,
-                                    start: block.start,
-                                    end: block.end,
-                                    allDay: block.allDay || false,
+                                    start: eventStart,
+                                    end: eventEnd,
+                                    allDay: false,  // Always false - we convert all-day to timed events
                                     backgroundColor: '#ef4444',
                                     borderColor: '#dc2626',
                                     textColor: '#ffffff',
                                     extendedProps: {
                                         timeRange: timeRange,
-                                        isAllDay: block.allDay || false
+                                        isAllDay: isAllDay  // Keep track of original all-day status
                                     }
                                 };
                             });
@@ -180,15 +195,12 @@ document.addEventListener('DOMContentLoaded', function () {
         // Customize event content
         eventContent: function(arg) {
             var view = arg.view.type;
-            // Check both our custom flag and FullCalendar's native allDay property
-            var isAllDay = arg.event.extendedProps.isAllDay || arg.event.allDay;
+            var isAllDay = arg.event.extendedProps.isAllDay;
 
             console.log('Event content:', {
                 title: arg.event.title,
                 view: view,
                 isAllDay: isAllDay,
-                fcAllDay: arg.event.allDay,
-                customAllDay: arg.event.extendedProps.isAllDay,
                 timeRange: arg.event.extendedProps.timeRange
             });
 
@@ -208,10 +220,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 };
             }
 
-            // Week/Day view: for all-day events, show title only
+            // Week/Day view: for all-day events (now displayed as full-day blocks), show title only
             if (isAllDay) {
                 return {
-                    html: '<div class="fc-event-title">' + (arg.event.title || '') + '</div>'
+                    html: '<div class="fc-event-title" style="text-align: center; font-weight: bold;">' +
+                          (arg.event.title || '') + '</div>'
                 };
             }
 
