@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', function () {
     var locale = element.getAttribute('data-locale') || 'cs';
     var firstDay = parseInt(element.getAttribute('data-first-day') || '1', 10);
 
+    // Track current view for event fetching
+    var currentCalendarView = initialView;
+
     // Show loading state
     element.innerHTML = '<div class="gcal-loading" style="padding: 40px; text-align: center; color: #666;">' +
         '<div style="font-size: 18px; margin-bottom: 10px;">⏳</div>' +
@@ -51,15 +54,15 @@ document.addEventListener('DOMContentLoaded', function () {
         events: function (info, successCallback, failureCallback) {
                     var startDate = info.startStr.slice(0, 10); // "2025-10-27"
                     var endDate = info.endStr.slice(0, 10);     // "2025-12-08"
-                    // Get current view type with fallback for initial load
-                    var currentView = (info.view && info.view.type) ? info.view.type : calendar.view.type;
+                    // Get current view type - use tracked variable as fallback
+                    var viewType = (info.view && info.view.type) ? info.view.type : currentCalendarView;
 
                     var url = GcalAvailability.restUrl
                         + '?start=' + encodeURIComponent(startDate)
                         + '&end=' + encodeURIComponent(endDate)
-                        + '&view=' + encodeURIComponent(currentView);
+                        + '&view=' + encodeURIComponent(viewType);
 
-                    console.log('GCal Availability: fetching', url, 'for view:', currentView);
+                    console.log('GCal Availability: fetching', url, 'for view:', viewType);
 
                     fetch(url, {
                         method: 'GET',
@@ -84,12 +87,12 @@ document.addEventListener('DOMContentLoaded', function () {
                             }
 
                             console.log('GCal Availability: data from API', data);
-                            console.log('GCal Availability: current view type:', currentView);
+                            console.log('GCal Availability: current view type:', viewType);
 
                             var events = [];
 
                             // Month view: show day-level availability (background color only)
-                            if (currentView === 'dayGridMonth') {
+                            if (viewType === 'dayGridMonth') {
                                 console.log('GCal Availability: processing MONTH view data');
                                 events = (data || []).map(function (day) {
                                     console.log('GCal Availability: day', day.date, 'available:', day.available);
@@ -158,10 +161,11 @@ document.addEventListener('DOMContentLoaded', function () {
         windowResize: function() {
             calendar.updateSize();
         },
-        // Force refetch when view changes (month -> week -> day)
+        // Track view changes and force refetch
         datesSet: function(info) {
             console.log('GCal Availability: view/dates changed to', info.view.type);
-            // This callback fires when view changes or dates change
+            // Update tracked view
+            currentCalendarView = info.view.type;
             // FullCalendar will automatically refetch events
         }
     });
