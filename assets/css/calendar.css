@@ -73,6 +73,18 @@
     opacity: 1 !important;
 }
 
+/* Business hours styling - make non-business hours darker/grayed out */
+.fc-non-business {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* On dark themes, make non-business hours even darker */
+@media (prefers-color-scheme: dark) {
+    .fc-non-business {
+        background-color: rgba(0, 0, 0, 0.3) !important;
+    }
+}
+
 /* Make sure day numbers are visible on colored backgrounds */
 .fc .fc-daygrid-day-number {
     position: relative;

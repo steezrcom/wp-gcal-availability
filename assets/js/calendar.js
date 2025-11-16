@@ -43,6 +43,14 @@ document.addEventListener('DOMContentLoaded', function () {
             week: locale === 'cs' ? 'Týden' : 'Week',
             day: locale === 'cs' ? 'Den' : 'Day'
         },
+        // Show only business hours in week/day views
+        businessHours: {
+            daysOfWeek: [1, 2, 3, 4, 5, 6, 0], // Monday - Sunday
+            startTime: '09:00',
+            endTime: '17:00'
+        },
+        slotMinTime: '00:00',
+        slotMaxTime: '24:00',
         loading: function(isLoading) {
             if (isLoading) {
                 console.log('GCal Availability: loading events...');
@@ -172,8 +180,14 @@ document.addEventListener('DOMContentLoaded', function () {
         datesSet: function(info) {
             console.log('GCal Availability: view/dates changed to', info.view.type);
             // Update tracked view
+            var previousView = currentCalendarView;
             currentCalendarView = info.view.type;
-            // FullCalendar will automatically refetch events
+
+            // Force refetch if view type changed (not just date navigation)
+            if (previousView !== currentCalendarView) {
+                console.log('GCal Availability: view type changed from', previousView, 'to', currentCalendarView, '- forcing refetch');
+                calendar.refetchEvents();
+            }
         }
     });
 
