@@ -74,6 +74,15 @@
     }
 }
 
+/* Clickable dates and events in month view */
+.fc-daygrid-day {
+    cursor: pointer;
+}
+
+.fc-daygrid-event {
+    cursor: pointer;
+}
+
 /* Make sure day numbers are visible on colored backgrounds */
 .fc .fc-daygrid-day-number {
     position: relative;

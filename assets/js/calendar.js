@@ -182,6 +182,16 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         },
 
+        // Click on an event in month view to go to day view
+        eventClick: function(info) {
+            if (info.view.type === 'dayGridMonth') {
+                info.jsEvent.preventDefault(); // Prevent default action
+                var eventDate = info.event.start;
+                console.log('GCal Availability: event clicked, navigating to day view:', eventDate);
+                calendar.changeView('timeGridDay', eventDate);
+            }
+        },
+
         // Responsive
         windowResize: function() {
             calendar.updateSize();
