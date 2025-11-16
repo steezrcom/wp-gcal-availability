@@ -83,6 +83,62 @@
     cursor: pointer;
 }
 
+/* Compact time slots in week/day views */
+.fc-timegrid-slot {
+    height: 2.5em !important;
+}
+
+.fc-timegrid-slot-label {
+    vertical-align: middle !important;
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+    /* Make calendar container responsive */
+    #gcal-availability-calendar {
+        margin-top: 20px !important;
+        font-size: 13px !important;
+    }
+
+    /* Compact toolbar on mobile */
+    .fc .fc-toolbar {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .fc .fc-toolbar-chunk {
+        display: flex;
+        justify-content: center;
+    }
+
+    /* Smaller buttons on mobile */
+    .fc .fc-button {
+        padding: 0.3em 0.5em;
+        font-size: 0.9em;
+    }
+
+    /* Compact time slots on mobile */
+    .fc-timegrid-slot {
+        height: 2em !important;
+    }
+
+    /* Smaller event text on mobile */
+    .fc-event {
+        font-size: 0.85em;
+    }
+
+    /* Hide time labels on very small screens */
+    @media (max-width: 480px) {
+        .fc-timegrid-slot-label {
+            font-size: 0.75em;
+        }
+
+        .fc .fc-toolbar-title {
+            font-size: 1.2em;
+        }
+    }
+}
+
 /* Make sure day numbers are visible on colored backgrounds */
 .fc .fc-daygrid-day-number {
     position: relative;

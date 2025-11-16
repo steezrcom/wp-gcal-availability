@@ -46,8 +46,18 @@ document.addEventListener('DOMContentLoaded', function () {
             startTime: '09:00',
             endTime: '17:00'
         },
-        slotMinTime: '00:00',
-        slotMaxTime: '24:00',
+        slotMinTime: '08:00',
+        slotMaxTime: '20:00',
+        slotDuration: '01:00',
+        slotLabelInterval: '01:00',
+
+        // Compact view settings
+        expandRows: false,
+        contentHeight: 'auto',
+
+        // Mobile responsive
+        handleWindowResize: true,
+        windowResizeDelay: 100,
         loading: function(isLoading) {
             if (isLoading) {
                 console.log('GCal Availability: loading events...');
