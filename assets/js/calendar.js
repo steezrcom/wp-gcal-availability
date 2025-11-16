@@ -88,18 +88,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
                             var events = [];
 
-                            // Month view: show day-level availability
+                            // Month view: show day-level availability (background color only)
                             if (currentView === 'dayGridMonth') {
                                 events = (data || []).map(function (day) {
                                     return {
-                                        title: day.available ? '✓ Available' : '✗ Full',
                                         start: day.date,
-                                        end: day.date,
                                         allDay: true,
-                                        backgroundColor: day.available ? '#10b981' : '#ef4444',
-                                        borderColor: day.available ? '#059669' : '#dc2626',
-                                        textColor: '#ffffff',
-                                        display: 'background'
+                                        display: 'background',
+                                        backgroundColor: day.available ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                                        borderColor: 'transparent'
                                     };
                                 });
                             }

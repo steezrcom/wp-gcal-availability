@@ -52,19 +52,33 @@
     font-weight: 500;
 }
 
-/* Month view day backgrounds */
+/* Month view day backgrounds - cleaner look with subtle colors */
 .fc-daygrid-day {
     position: relative;
 }
 
-/* Available day (green) */
-.fc-daygrid-day.fc-day-available {
-    background-color: rgba(16, 185, 129, 0.1);
+/* Make sure day numbers are visible on colored backgrounds */
+.fc .fc-daygrid-day-number {
+    position: relative;
+    z-index: 2;
+    color: #111827;
+    font-weight: 600;
 }
 
-/* Full day (red) */
-.fc-daygrid-day.fc-day-full {
-    background-color: rgba(239, 68, 68, 0.1);
+/* Today styling - make it stand out */
+.fc .fc-daygrid-day.fc-day-today {
+    background-color: #dbeafe !important;
+}
+
+.fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
+    background-color: #3b82f6;
+    color: white;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Responsive adjustments */
@@ -126,14 +140,7 @@
     border-color: #e5e7eb;
 }
 
-.fc .fc-daygrid-day-number {
-    padding: 8px;
-    font-weight: 500;
-}
-
-.fc .fc-daygrid-day.fc-day-today {
-    background-color: #eff6ff;
-}
+/* Day number styling is handled above */
 
 .fc .fc-col-header-cell {
     background-color: #f9fafb;

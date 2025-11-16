@@ -809,6 +809,7 @@ final class Gcal_Availability {
             'initial_view' => 'dayGridMonth',
             'locale' => 'cs',
             'first_day' => '1',
+            'custom_css' => '',
         ], $atts, 'gcal_availability_calendar');
 
         // Check if iCal URL is configured
@@ -824,12 +825,21 @@ final class Gcal_Availability {
                 . '</div>';
         }
 
-        return sprintf(
+        $output = '';
+
+        // Add custom CSS if provided
+        if (!empty($atts['custom_css'])) {
+            $output .= '<style>' . wp_strip_all_tags($atts['custom_css']) . '</style>';
+        }
+
+        $output .= sprintf(
             '<div id="gcal-availability-calendar" data-initial-view="%s" data-locale="%s" data-first-day="%s"></div>',
             esc_attr($atts['initial_view']),
             esc_attr($atts['locale']),
             esc_attr($atts['first_day'])
         );
+
+        return $output;
     }
 }
 
