@@ -47,9 +47,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log('GCal Availability: events loaded');
             }
         },
-        eventSources: [
-            {
-                events: function (info, successCallback, failureCallback) {
+        // Use events function directly instead of eventSources array
+        events: function (info, successCallback, failureCallback) {
                     var startDate = info.startStr.slice(0, 10); // "2025-10-27"
                     var endDate = info.endStr.slice(0, 10);     // "2025-12-08"
                     // Get current view type - info.view.type is the correct way
@@ -140,9 +139,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                             failureCallback(error);
                         });
-                }
-            }
-        ],
+        },
         eventTimeFormat: {
             hour: '2-digit',
             minute: '2-digit',
@@ -161,10 +158,11 @@ document.addEventListener('DOMContentLoaded', function () {
         windowResize: function() {
             calendar.updateSize();
         },
-        // Refetch events when view changes (month -> week -> day)
-        viewDidMount: function(info) {
-            console.log('GCal Availability: view changed to', info.view.type);
-            // Events will automatically refetch due to date range change
+        // Force refetch when view changes (month -> week -> day)
+        datesSet: function(info) {
+            console.log('GCal Availability: view/dates changed to', info.view.type);
+            // This callback fires when view changes or dates change
+            // FullCalendar will automatically refetch events
         }
     });
 
