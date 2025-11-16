@@ -174,6 +174,14 @@ document.addEventListener('DOMContentLoaded', function () {
             };
         },
 
+        // Click on a date in month view to go to day view
+        dateClick: function(info) {
+            if (info.view.type === 'dayGridMonth') {
+                console.log('GCal Availability: date clicked, navigating to day view:', info.dateStr);
+                calendar.changeView('timeGridDay', info.date);
+            }
+        },
+
         // Responsive
         windowResize: function() {
             calendar.updateSize();
