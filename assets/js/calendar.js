@@ -52,8 +52,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 events: function (info, successCallback, failureCallback) {
                     var startDate = info.startStr.slice(0, 10); // "2025-10-27"
                     var endDate = info.endStr.slice(0, 10);     // "2025-12-08"
-                    // Get current view type from info object instead of calendar
-                    var currentView = info.view ? info.view.type : 'dayGridMonth';
+                    // Get current view type - info.view.type is the correct way
+                    var currentView = info.view.type;
 
                     var url = GcalAvailability.restUrl
                         + '?start=' + encodeURIComponent(startDate)
@@ -160,6 +160,11 @@ document.addEventListener('DOMContentLoaded', function () {
         // Responsive
         windowResize: function() {
             calendar.updateSize();
+        },
+        // Refetch events when view changes (month -> week -> day)
+        viewDidMount: function(info) {
+            console.log('GCal Availability: view changed to', info.view.type);
+            // Events will automatically refetch due to date range change
         }
     });
 

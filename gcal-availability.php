@@ -140,7 +140,9 @@ final class Gcal_Availability {
 
         $start = sanitize_text_field($request->get_param('start'));
         $end   = sanitize_text_field($request->get_param('end'));
-        $view  = sanitize_text_field($request->get_param('view'));
+        $view  = sanitize_text_field($request->get_param('view')) ?: 'dayGridMonth';
+
+        $this->log("API Request: start=$start, end=$end, view=$view", 'info');
 
         // Validate iCal URL is configured
         $icalUrl = $this->get_ical_url();
@@ -172,6 +174,8 @@ final class Gcal_Availability {
                 500
             );
         }
+
+        $this->log("View type: $view, returning " . ($view === 'dayGridMonth' ? 'month' : 'week/day') . " data", 'info');
 
         // For month view, return day-level availability status
         if ($view === 'dayGridMonth') {
