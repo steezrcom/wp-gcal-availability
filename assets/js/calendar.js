@@ -176,16 +176,21 @@ document.addEventListener('DOMContentLoaded', function () {
         windowResize: function() {
             calendar.updateSize();
         },
-        // Track view changes and force refetch
-        datesSet: function(info) {
-            console.log('GCal Availability: view/dates changed to', info.view.type);
+        // Track view changes and clear events immediately
+        viewWillUnmount: function(info) {
+            console.log('GCal Availability: view will unmount:', info.view.type);
+            // Remove all events when switching views to prevent flash
+            calendar.removeAllEvents();
+        },
+        viewDidMount: function(info) {
+            console.log('GCal Availability: view mounted:', info.view.type);
             // Update tracked view
             var previousView = currentCalendarView;
             currentCalendarView = info.view.type;
 
-            // Force refetch if view type changed (not just date navigation)
+            // Force refetch if view type changed
             if (previousView !== currentCalendarView) {
-                console.log('GCal Availability: view type changed from', previousView, 'to', currentCalendarView, '- forcing refetch');
+                console.log('GCal Availability: view type changed, refetching events');
                 calendar.refetchEvents();
             }
         }

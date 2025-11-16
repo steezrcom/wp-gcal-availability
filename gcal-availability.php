@@ -790,7 +790,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/js/calendar.js', __FILE__),
             ['fullcalendar'],
-            '1.1.3',
+            '1.1.4',
             true
         );
 
