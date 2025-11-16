@@ -136,14 +136,21 @@
         background-color: #ef4444 !important;
         border: 1px solid #dc2626 !important;
         border-radius: 4px !important;
-        padding: 2px 4px !important;
-        margin: 1px 2px !important;
+        padding: 4px 6px !important;
+        margin: 2px !important;
+        display: block !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
     }
 
     .fc-daygrid-dot-event .fc-event-time {
         color: #ffffff !important;
-        font-weight: 500 !important;
-        display: block !important;
+        font-weight: 600 !important;
+        display: inline !important;
+        white-space: nowrap !important;
+        font-size: 0.85em !important;
+        line-height: 1.2 !important;
     }
 
     .fc-daygrid-dot-event .fc-event-title {
@@ -152,7 +159,11 @@
 
     /* Make day cells taller to accommodate block events */
     .fc-daygrid-day-frame {
-        min-height: 80px !important;
+        min-height: 100px !important;
+    }
+
+    .fc-daygrid-day-events {
+        margin-top: 2px !important;
     }
 
     /* Hide time labels on very small screens */
@@ -167,12 +178,16 @@
 
         /* Even more compact on very small screens */
         .fc-daygrid-day-frame {
-            min-height: 60px !important;
+            min-height: 90px !important;
         }
 
         .fc-daygrid-dot-event {
-            font-size: 0.75em;
-            padding: 1px 2px !important;
+            font-size: 0.8em !important;
+            padding: 3px 5px !important;
+        }
+
+        .fc-daygrid-dot-event .fc-event-time {
+            font-size: 0.9em !important;
         }
     }
 }
