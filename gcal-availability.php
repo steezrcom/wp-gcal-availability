@@ -405,8 +405,14 @@ final class Gcal_Availability {
                 $insideEvent = false;
 
                 if (isset($current['DTSTART']) && isset($current['DTEND'])) {
-                    // Check if this is an all-day event (date only, no time)
-                    $isAllDay = strlen(trim($current['DTSTART'])) === 8 && ctype_digit(trim($current['DTSTART']));
+                    // Check if this is an all-day event
+                    // Method 1: Check if VALUE=DATE parameter is present
+                    // Method 2: Check if date is 8 digits (date only, no time)
+                    $isAllDay = (isset($current['DTSTART_ISDATE']) && $current['DTSTART_ISDATE']) ||
+                                (strlen(trim($current['DTSTART'])) === 8 && ctype_digit(trim($current['DTSTART'])));
+
+                    // Debug logging
+                    $this->log("Event DTSTART: " . $current['DTSTART'] . " (length: " . strlen(trim($current['DTSTART'])) . ", isAllDay: " . ($isAllDay ? 'true' : 'false') . ")");
 
                     $startUtc = $this->parse_ical_datetime($current['DTSTART'], $current['DTSTART_TZID'] ?? null);
                     $endUtc   = $this->parse_ical_datetime($current['DTEND'], $current['DTEND_TZID'] ?? null);
@@ -420,6 +426,7 @@ final class Gcal_Availability {
                         // Add allDay flag if it's an all-day event
                         if ($isAllDay) {
                             $event['allDay'] = true;
+                            $this->log("All-day event detected: {$startUtc} to {$endUtc}");
                         }
 
                         $events[] = $event;
@@ -447,9 +454,16 @@ final class Gcal_Availability {
                     $current[$propName] = $value;
 
                     // Extract timezone if present
-                    if (isset($nameSubparts[1]) && strpos($nameSubparts[1], 'TZID=') === 0) {
-                        $tzid = substr($nameSubparts[1], 5);
-                        $current[$propName . '_TZID'] = $tzid;
+                    if (isset($nameSubparts[1])) {
+                        // Check for TZID parameter
+                        if (strpos($nameSubparts[1], 'TZID=') === 0) {
+                            $tzid = substr($nameSubparts[1], 5);
+                            $current[$propName . '_TZID'] = $tzid;
+                        }
+                        // Check for VALUE=DATE parameter (indicates all-day event)
+                        if (strpos($nameSubparts[1], 'VALUE=DATE') !== false) {
+                            $current[$propName . '_ISDATE'] = true;
+                        }
                     }
                 }
             }
@@ -475,18 +489,13 @@ final class Gcal_Availability {
 
         // Check if it's an all-day event (date only, no time)
         if (strlen($value) === 8 && ctype_digit($value)) {
-            $dt = DateTime::createFromFormat('Ymd', $value);
+            // For all-day events, create date at midnight UTC
+            $dt = DateTime::createFromFormat('Ymd', $value, new DateTimeZone('UTC'));
             if (! $dt) {
                 return null;
             }
-            // For all-day events, use midnight in the specified timezone or UTC
-            if ($tzid) {
-                try {
-                    $dt->setTimezone(new DateTimeZone($tzid));
-                } catch (Exception $e) {
-                    $this->log("Invalid timezone: {$tzid}", 'warning');
-                }
-            }
+            // Set time to 00:00:00
+            $dt->setTime(0, 0, 0);
             return $dt->format(DateTime::ATOM);
         }
 
@@ -793,7 +802,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/css/calendar.css', __FILE__),
             ['fullcalendar'],
-            '1.3.0'
+            '1.3.1'
         );
 
         wp_enqueue_script(
@@ -808,7 +817,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/js/calendar.js', __FILE__),
             ['fullcalendar'],
-            '1.3.0',
+            '1.3.1',
             true
         );
 
