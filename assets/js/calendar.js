@@ -99,11 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                         backgroundColor: day.available ? '#10b981' : '#ef4444',
                                         borderColor: day.available ? '#059669' : '#dc2626',
                                         textColor: '#ffffff',
-                                        display: 'background',
-                                        extendedProps: {
-                                            bookedSlots: day.bookedSlots,
-                                            totalSlots: day.totalSlots
-                                        }
+                                        display: 'background'
                                     };
                                 });
                             }

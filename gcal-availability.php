@@ -35,7 +35,8 @@ final class Gcal_Availability {
             'ical_url' => '',
             'cache_duration' => 300,
             'enable_logging' => false,
-            'daily_slots' => 1,
+            'opening_hours_start' => '09:00',
+            'opening_hours_end' => '17:00',
         ];
 
         $settings = get_option(self::OPTION_NAME, $defaults);
@@ -191,31 +192,28 @@ final class Gcal_Availability {
 
     /**
      * Get month view data - returns day-level availability
+     * A day is available if there are at least 2 consecutive hours free within opening hours
      */
     private function get_month_view_data(array $events, string $start, string $end): array {
         $settings = $this->get_settings();
-        $dailySlots = $settings['daily_slots'] ?? 1;
+        $openingStart = $settings['opening_hours_start'] ?? '09:00';
+        $openingEnd = $settings['opening_hours_end'] ?? '17:00';
 
-        // Count events per day
+        // Group events by day
         $eventsByDay = [];
         foreach ($events as $event) {
             $eventStart = new DateTime($event['start']);
             $eventEnd = new DateTime($event['end']);
+            $dayKey = $eventStart->format('Y-m-d');
 
-            // For all-day events or events spanning multiple days
-            $currentDate = clone $eventStart;
-            $currentDate->setTime(0, 0, 0);
-            $endDate = clone $eventEnd;
-            $endDate->setTime(0, 0, 0);
-
-            while ($currentDate <= $endDate) {
-                $dayKey = $currentDate->format('Y-m-d');
-                if (!isset($eventsByDay[$dayKey])) {
-                    $eventsByDay[$dayKey] = 0;
-                }
-                $eventsByDay[$dayKey]++;
-                $currentDate->modify('+1 day');
+            if (!isset($eventsByDay[$dayKey])) {
+                $eventsByDay[$dayKey] = [];
             }
+
+            $eventsByDay[$dayKey][] = [
+                'start' => $eventStart,
+                'end' => $eventEnd,
+            ];
         }
 
         // Generate day blocks with availability status
@@ -226,20 +224,70 @@ final class Gcal_Availability {
         $currentDate = clone $startDate;
         while ($currentDate < $endDate) {
             $dayKey = $currentDate->format('Y-m-d');
-            $bookedSlots = $eventsByDay[$dayKey] ?? 0;
-            $available = $bookedSlots < $dailySlots;
+            $dayEvents = $eventsByDay[$dayKey] ?? [];
+
+            // Check if there are at least 2 consecutive hours free
+            $available = $this->has_two_hours_free($dayKey, $dayEvents, $openingStart, $openingEnd);
 
             $dayBlocks[] = [
                 'date' => $dayKey,
                 'available' => $available,
-                'bookedSlots' => $bookedSlots,
-                'totalSlots' => $dailySlots,
             ];
 
             $currentDate->modify('+1 day');
         }
 
         return $dayBlocks;
+    }
+
+    /**
+     * Check if a day has at least 2 consecutive hours free within opening hours
+     */
+    private function has_two_hours_free(string $date, array $events, string $openingStart, string $openingEnd): bool {
+        // Create opening hours datetime objects for this day
+        $dayStart = new DateTime($date . ' ' . $openingStart);
+        $dayEnd = new DateTime($date . ' ' . $openingEnd);
+
+        // If no events, entire day is free
+        if (empty($events)) {
+            return true;
+        }
+
+        // Sort events by start time
+        usort($events, function($a, $b) {
+            return $a['start'] <=> $b['start'];
+        });
+
+        // Check gap before first event
+        $firstEvent = $events[0];
+        if ($firstEvent['start'] > $dayStart) {
+            $gapMinutes = ($firstEvent['start']->getTimestamp() - $dayStart->getTimestamp()) / 60;
+            if ($gapMinutes >= 120) {
+                return true;
+            }
+        }
+
+        // Check gaps between events
+        for ($i = 0; $i < count($events) - 1; $i++) {
+            $currentEnd = $events[$i]['end'];
+            $nextStart = $events[$i + 1]['start'];
+
+            $gapMinutes = ($nextStart->getTimestamp() - $currentEnd->getTimestamp()) / 60;
+            if ($gapMinutes >= 120) {
+                return true;
+            }
+        }
+
+        // Check gap after last event
+        $lastEvent = $events[count($events) - 1];
+        if ($lastEvent['end'] < $dayEnd) {
+            $gapMinutes = ($dayEnd->getTimestamp() - $lastEvent['end']->getTimestamp()) / 60;
+            if ($gapMinutes >= 120) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -504,9 +552,17 @@ final class Gcal_Availability {
         );
 
         add_settings_field(
-            'daily_slots',
-            __('Daily Availability Slots', 'gcal-availability'),
-            [$this, 'render_daily_slots_field'],
+            'opening_hours_start',
+            __('Opening Hours Start', 'gcal-availability'),
+            [$this, 'render_opening_hours_start_field'],
+            'gcal-availability',
+            'gcal_availability_main'
+        );
+
+        add_settings_field(
+            'opening_hours_end',
+            __('Opening Hours End', 'gcal-availability'),
+            [$this, 'render_opening_hours_end_field'],
             'gcal-availability',
             'gcal_availability_main'
         );
@@ -531,14 +587,26 @@ final class Gcal_Availability {
 
         $sanitized['enable_logging'] = isset($input['enable_logging']) && $input['enable_logging'] === '1';
 
-        if (isset($input['daily_slots'])) {
-            $sanitized['daily_slots'] = absint($input['daily_slots']);
-            if ($sanitized['daily_slots'] < 1) {
-                $sanitized['daily_slots'] = 1; // Minimum 1 slot
-            }
+        // Validate opening hours (HH:MM format)
+        if (isset($input['opening_hours_start'])) {
+            $sanitized['opening_hours_start'] = $this->sanitize_time($input['opening_hours_start'], '09:00');
+        }
+
+        if (isset($input['opening_hours_end'])) {
+            $sanitized['opening_hours_end'] = $this->sanitize_time($input['opening_hours_end'], '17:00');
         }
 
         return $sanitized;
+    }
+
+    /**
+     * Sanitize time input (HH:MM format)
+     */
+    private function sanitize_time(string $time, string $default): string {
+        if (preg_match('/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/', $time)) {
+            return $time;
+        }
+        return $default;
     }
 
     /**
@@ -634,16 +702,26 @@ final class Gcal_Availability {
         <?php
     }
 
-    public function render_daily_slots_field(): void {
+    public function render_opening_hours_start_field(): void {
         $settings = $this->get_settings();
-        $value = $settings['daily_slots'] ?? 1;
+        $value = $settings['opening_hours_start'] ?? '09:00';
         ?>
-        <input type="number" name="<?php echo esc_attr(self::OPTION_NAME); ?>[daily_slots]"
-               value="<?php echo esc_attr($value); ?>"
-               min="1"
-               step="1">
+        <input type="time" name="<?php echo esc_attr(self::OPTION_NAME); ?>[opening_hours_start]"
+               value="<?php echo esc_attr($value); ?>">
         <p class="description">
-            <?php _e('Number of available slots per day. Month view shows green when slots are available, red when all slots are booked.', 'gcal-availability'); ?>
+            <?php _e('Start time for availability checking (e.g., 09:00)', 'gcal-availability'); ?>
+        </p>
+        <?php
+    }
+
+    public function render_opening_hours_end_field(): void {
+        $settings = $this->get_settings();
+        $value = $settings['opening_hours_end'] ?? '17:00';
+        ?>
+        <input type="time" name="<?php echo esc_attr(self::OPTION_NAME); ?>[opening_hours_end]"
+               value="<?php echo esc_attr($value); ?>">
+        <p class="description">
+            <?php _e('End time for availability checking (e.g., 17:00). A day is available if there are at least 2 consecutive hours free.', 'gcal-availability'); ?>
         </p>
         <?php
     }
