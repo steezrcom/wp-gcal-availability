@@ -400,7 +400,6 @@ document.addEventListener('DOMContentLoaded', function () {
             // Create CTA button container
             var ctaContainer = document.createElement('div');
             ctaContainer.className = 'gcal-cta-container';
-            ctaContainer.style.display = 'none'; // Hidden by default, shown in day/week views
 
             var ctaButton = document.createElement('a');
             ctaButton.className = 'gcal-cta-button';
@@ -437,22 +436,13 @@ document.addEventListener('DOMContentLoaded', function () {
             ctaContainer.appendChild(ctaButton);
             element.parentNode.insertBefore(ctaContainer, element.nextSibling);
 
-            // Function to update CTA button visibility and text
+            // Function to update CTA button text based on current view
             function updateCtaButton() {
-                var view = calendar.view;
-                var isDayOrWeekView = view.type === 'timeGridDay' || view.type === 'timeGridWeek';
-
-                if (isDayOrWeekView) {
-                    ctaContainer.style.display = 'block';
-
-                    // Update button text with current date
-                    var currentDate = calendar.getDate();
-                    var dateStr = currentDate.toISOString().split('T')[0];
-                    var buttonText = GcalAvailability.settings.ctaButtonText.replace('{date}', dateStr);
-                    ctaButton.textContent = buttonText;
-                } else {
-                    ctaContainer.style.display = 'none';
-                }
+                // Update button text with current date
+                var currentDate = calendar.getDate();
+                var dateStr = currentDate.toISOString().split('T')[0];
+                var buttonText = GcalAvailability.settings.ctaButtonText.replace('{date}', dateStr);
+                ctaButton.textContent = buttonText;
             }
 
             // Update on view change

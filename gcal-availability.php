@@ -936,10 +936,10 @@ final class Gcal_Availability {
         <label>
             <input type="checkbox" name="<?php echo esc_attr(self::OPTION_NAME); ?>[show_cta_button]"
                    value="1" <?php checked($value, true); ?>>
-            <?php _e('Show a call-to-action button at the bottom of day/week views', 'gcal-availability'); ?>
+            <?php _e('Show a call-to-action button at the bottom of the calendar', 'gcal-availability'); ?>
         </label>
         <p class="description">
-            <?php _e('When enabled, a button will be displayed below the calendar in day and week views.', 'gcal-availability'); ?>
+            <?php _e('When enabled, a button will be displayed below the calendar in all views.', 'gcal-availability'); ?>
         </p>
         <?php
     }
@@ -953,7 +953,7 @@ final class Gcal_Availability {
                class="regular-text"
                placeholder="Book Now">
         <p class="description">
-            <?php _e('Text to display on the CTA button (e.g., "Book Now", "Contact Us", "Reserve a Table"). You can use {date} placeholder which will be replaced with the currently viewed date in YYYY-MM-DD format.', 'gcal-availability'); ?>
+            <?php _e('Text to display on the CTA button (e.g., "Book Now", "Contact Us", "Reserve a Table"). You can use {date} placeholder which will be replaced with the currently viewed date in YYYY-MM-DD format (in day/week views) or the first day of the month (in month view).', 'gcal-availability'); ?>
         </p>
         <?php
     }
@@ -967,7 +967,7 @@ final class Gcal_Availability {
                class="regular-text"
                placeholder="https://example.com/booking or #contact-form">
         <p class="description">
-            <?php _e('URL to navigate to when the CTA button is clicked. You can use {date} placeholder which will be replaced with the currently viewed date in YYYY-MM-DD format. Example: https://example.com/booking?date={date} or #contact-form', 'gcal-availability'); ?>
+            <?php _e('URL to navigate to when the CTA button is clicked. You can use {date} placeholder which will be replaced with the currently viewed date in YYYY-MM-DD format (in day/week views) or the first day of the month (in month view). Example: https://example.com/booking?date={date} or #contact-form', 'gcal-availability'); ?>
         </p>
         <?php
     }
@@ -1017,7 +1017,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/css/calendar.css', __FILE__),
             ['fullcalendar'],
-            '2.0.0'
+            '2.0.1'
         );
 
         wp_enqueue_script(
@@ -1032,7 +1032,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/js/calendar.js', __FILE__),
             ['fullcalendar'],
-            '2.0.0',
+            '2.0.1',
             true
         );
 
