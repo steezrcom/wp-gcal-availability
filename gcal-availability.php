@@ -52,6 +52,9 @@ final class Gcal_Availability {
             'hide_non_business_hours' => false,
             'month_click_action' => 'day_view',  // 'day_view' or 'redirect'
             'month_click_url' => '',
+            'show_cta_button' => false,
+            'cta_button_text' => '',
+            'cta_button_url' => '',
         ];
 
         $settings = get_option(self::OPTION_NAME, $defaults);
@@ -673,6 +676,30 @@ final class Gcal_Availability {
             'gcal-availability',
             'gcal_availability_main'
         );
+
+        add_settings_field(
+            'show_cta_button',
+            __('Show CTA Button', 'gcal-availability'),
+            [$this, 'render_show_cta_button_field'],
+            'gcal-availability',
+            'gcal_availability_main'
+        );
+
+        add_settings_field(
+            'cta_button_text',
+            __('CTA Button Text', 'gcal-availability'),
+            [$this, 'render_cta_button_text_field'],
+            'gcal-availability',
+            'gcal_availability_main'
+        );
+
+        add_settings_field(
+            'cta_button_url',
+            __('CTA Button URL', 'gcal-availability'),
+            [$this, 'render_cta_button_url_field'],
+            'gcal-availability',
+            'gcal_availability_main'
+        );
     }
 
     /**
@@ -713,6 +740,16 @@ final class Gcal_Availability {
 
         if (isset($input['month_click_url'])) {
             $sanitized['month_click_url'] = esc_url_raw($input['month_click_url']);
+        }
+
+        $sanitized['show_cta_button'] = isset($input['show_cta_button']) && $input['show_cta_button'] === '1';
+
+        if (isset($input['cta_button_text'])) {
+            $sanitized['cta_button_text'] = sanitize_text_field($input['cta_button_text']);
+        }
+
+        if (isset($input['cta_button_url'])) {
+            $sanitized['cta_button_url'] = esc_url_raw($input['cta_button_url']);
         }
 
         return $sanitized;
@@ -892,6 +929,49 @@ final class Gcal_Availability {
         <?php
     }
 
+    public function render_show_cta_button_field(): void {
+        $settings = $this->get_settings();
+        $value = $settings['show_cta_button'] ?? false;
+        ?>
+        <label>
+            <input type="checkbox" name="<?php echo esc_attr(self::OPTION_NAME); ?>[show_cta_button]"
+                   value="1" <?php checked($value, true); ?>>
+            <?php _e('Show a call-to-action button at the bottom of day/week views', 'gcal-availability'); ?>
+        </label>
+        <p class="description">
+            <?php _e('When enabled, a button will be displayed below the calendar in day and week views.', 'gcal-availability'); ?>
+        </p>
+        <?php
+    }
+
+    public function render_cta_button_text_field(): void {
+        $settings = $this->get_settings();
+        $value = $settings['cta_button_text'] ?? '';
+        ?>
+        <input type="text" name="<?php echo esc_attr(self::OPTION_NAME); ?>[cta_button_text]"
+               value="<?php echo esc_attr($value); ?>"
+               class="regular-text"
+               placeholder="Book Now">
+        <p class="description">
+            <?php _e('Text to display on the CTA button (e.g., "Book Now", "Contact Us", "Reserve a Table"). You can use {date} placeholder which will be replaced with the currently viewed date in YYYY-MM-DD format.', 'gcal-availability'); ?>
+        </p>
+        <?php
+    }
+
+    public function render_cta_button_url_field(): void {
+        $settings = $this->get_settings();
+        $value = $settings['cta_button_url'] ?? '';
+        ?>
+        <input type="text" name="<?php echo esc_attr(self::OPTION_NAME); ?>[cta_button_url]"
+               value="<?php echo esc_attr($value); ?>"
+               class="regular-text"
+               placeholder="https://example.com/booking or #contact-form">
+        <p class="description">
+            <?php _e('URL to navigate to when the CTA button is clicked. You can use {date} placeholder which will be replaced with the currently viewed date in YYYY-MM-DD format. Example: https://example.com/booking?date={date} or #contact-form', 'gcal-availability'); ?>
+        </p>
+        <?php
+    }
+
     /**
      * Clear all plugin caches
      */
@@ -937,7 +1017,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/css/calendar.css', __FILE__),
             ['fullcalendar'],
-            '1.9.0'
+            '2.0.0'
         );
 
         wp_enqueue_script(
@@ -952,7 +1032,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/js/calendar.js', __FILE__),
             ['fullcalendar'],
-            '1.9.0',
+            '2.0.0',
             true
         );
 
@@ -969,6 +1049,9 @@ final class Gcal_Availability {
                     'hideNonBusinessHours' => $settings['hide_non_business_hours'] ?? false,
                     'monthClickAction' => $settings['month_click_action'] ?? 'day_view',
                     'monthClickUrl' => $settings['month_click_url'] ?? '',
+                    'showCtaButton' => $settings['show_cta_button'] ?? false,
+                    'ctaButtonText' => $settings['cta_button_text'] ?? '',
+                    'ctaButtonUrl' => $settings['cta_button_url'] ?? '',
                 ],
                 'i18n' => [
                     'loading' => __('Loading calendar...', 'gcal-availability'),

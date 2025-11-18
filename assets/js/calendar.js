@@ -391,6 +391,76 @@ document.addEventListener('DOMContentLoaded', function () {
     try {
         calendar.render();
         console.log('GCal Availability: calendar rendered successfully');
+
+        // Add CTA button if enabled
+        if (GcalAvailability.settings.showCtaButton &&
+            GcalAvailability.settings.ctaButtonText &&
+            GcalAvailability.settings.ctaButtonUrl) {
+
+            // Create CTA button container
+            var ctaContainer = document.createElement('div');
+            ctaContainer.className = 'gcal-cta-container';
+            ctaContainer.style.display = 'none'; // Hidden by default, shown in day/week views
+
+            var ctaButton = document.createElement('a');
+            ctaButton.className = 'gcal-cta-button';
+            ctaButton.href = '#';
+            ctaButton.textContent = GcalAvailability.settings.ctaButtonText;
+
+            ctaButton.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // Get current view date
+                var currentDate = calendar.getDate();
+                var dateStr = currentDate.toISOString().split('T')[0];
+
+                // Replace {date} placeholder
+                var url = GcalAvailability.settings.ctaButtonUrl.replace('{date}', dateStr);
+                var buttonText = GcalAvailability.settings.ctaButtonText.replace('{date}', dateStr);
+                ctaButton.textContent = buttonText;
+
+                console.log('GCal Availability: CTA button clicked, navigating to:', url);
+
+                // Check if it's an anchor link
+                if (url.startsWith('#')) {
+                    // Scroll to anchor
+                    var targetElement = document.querySelector(url);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                } else {
+                    // Navigate to URL
+                    window.location.href = url;
+                }
+            });
+
+            ctaContainer.appendChild(ctaButton);
+            element.parentNode.insertBefore(ctaContainer, element.nextSibling);
+
+            // Function to update CTA button visibility and text
+            function updateCtaButton() {
+                var view = calendar.view;
+                var isDayOrWeekView = view.type === 'timeGridDay' || view.type === 'timeGridWeek';
+
+                if (isDayOrWeekView) {
+                    ctaContainer.style.display = 'block';
+
+                    // Update button text with current date
+                    var currentDate = calendar.getDate();
+                    var dateStr = currentDate.toISOString().split('T')[0];
+                    var buttonText = GcalAvailability.settings.ctaButtonText.replace('{date}', dateStr);
+                    ctaButton.textContent = buttonText;
+                } else {
+                    ctaContainer.style.display = 'none';
+                }
+            }
+
+            // Update on view change
+            calendar.on('datesSet', updateCtaButton);
+
+            // Initial update
+            updateCtaButton();
+        }
     } catch (error) {
         console.error('GCal Availability: failed to render calendar', error);
         element.innerHTML = '<div class="gcal-error" style="padding: 20px; background: #fee; border: 1px solid #c33; border-radius: 4px; color: #c33; text-align: center;">' +
