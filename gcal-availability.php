@@ -50,6 +50,8 @@ final class Gcal_Availability {
             'opening_hours_start' => '09:00',
             'opening_hours_end' => '17:00',
             'hide_non_business_hours' => false,
+            'month_click_action' => 'day_view',  // 'day_view' or 'redirect'
+            'month_click_url' => '',
         ];
 
         $settings = get_option(self::OPTION_NAME, $defaults);
@@ -655,6 +657,22 @@ final class Gcal_Availability {
             'gcal-availability',
             'gcal_availability_main'
         );
+
+        add_settings_field(
+            'month_click_action',
+            __('Month View Click Action', 'gcal-availability'),
+            [$this, 'render_month_click_action_field'],
+            'gcal-availability',
+            'gcal_availability_main'
+        );
+
+        add_settings_field(
+            'month_click_url',
+            __('Redirect URL', 'gcal-availability'),
+            [$this, 'render_month_click_url_field'],
+            'gcal-availability',
+            'gcal_availability_main'
+        );
     }
 
     /**
@@ -686,6 +704,16 @@ final class Gcal_Availability {
         }
 
         $sanitized['hide_non_business_hours'] = isset($input['hide_non_business_hours']) && $input['hide_non_business_hours'] === '1';
+
+        if (isset($input['month_click_action'])) {
+            $sanitized['month_click_action'] = in_array($input['month_click_action'], ['day_view', 'redirect'])
+                ? $input['month_click_action']
+                : 'day_view';
+        }
+
+        if (isset($input['month_click_url'])) {
+            $sanitized['month_click_url'] = esc_url_raw($input['month_click_url']);
+        }
 
         return $sanitized;
     }
@@ -824,10 +852,42 @@ final class Gcal_Availability {
         <label>
             <input type="checkbox" name="<?php echo esc_attr(self::OPTION_NAME); ?>[hide_non_business_hours]"
                    value="1" <?php checked($value, true); ?>>
-            <?php _e('Completely hide non-business hours in week/day views (only show business hours)', 'gcal-availability'); ?>
+            <?php _e('Hide/compress non-business hours in week/day views', 'gcal-availability'); ?>
         </label>
         <p class="description">
-            <?php _e('When enabled, the calendar will only display business hours instead of showing the full day. This makes the calendar more compact. Note: For midnight-crossing hours, this setting is ignored and the full day is shown.', 'gcal-availability'); ?>
+            <?php _e('When enabled, the calendar will only display business hours. For normal hours (e.g., 09:00-17:00), non-business hours are completely hidden. For midnight-crossing hours (e.g., 22:00-02:00), non-business hours are compressed to thin separator lines to save space while showing the full day.', 'gcal-availability'); ?>
+        </p>
+        <?php
+    }
+
+    public function render_month_click_action_field(): void {
+        $settings = $this->get_settings();
+        $value = $settings['month_click_action'] ?? 'day_view';
+        ?>
+        <select name="<?php echo esc_attr(self::OPTION_NAME); ?>[month_click_action]">
+            <option value="day_view" <?php selected($value, 'day_view'); ?>>
+                <?php _e('Switch to Day View', 'gcal-availability'); ?>
+            </option>
+            <option value="redirect" <?php selected($value, 'redirect'); ?>>
+                <?php _e('Redirect to URL', 'gcal-availability'); ?>
+            </option>
+        </select>
+        <p class="description">
+            <?php _e('Choose what happens when a user clicks on a date or event in month view.', 'gcal-availability'); ?>
+        </p>
+        <?php
+    }
+
+    public function render_month_click_url_field(): void {
+        $settings = $this->get_settings();
+        $value = $settings['month_click_url'] ?? '';
+        ?>
+        <input type="text" name="<?php echo esc_attr(self::OPTION_NAME); ?>[month_click_url]"
+               value="<?php echo esc_attr($value); ?>"
+               class="regular-text"
+               placeholder="https://example.com/contact or #contact-form">
+        <p class="description">
+            <?php _e('URL to redirect to when clicking in month view (only used if "Redirect to URL" is selected above). You can use {date} placeholder which will be replaced with the clicked date in YYYY-MM-DD format. Example: https://example.com/booking?date={date} or #contact-form', 'gcal-availability'); ?>
         </p>
         <?php
     }
@@ -877,7 +937,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/css/calendar.css', __FILE__),
             ['fullcalendar'],
-            '1.7.1'
+            '1.9.0'
         );
 
         wp_enqueue_script(
@@ -892,7 +952,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/js/calendar.js', __FILE__),
             ['fullcalendar'],
-            '1.7.1',
+            '1.9.0',
             true
         );
 
@@ -907,6 +967,8 @@ final class Gcal_Availability {
                     'openingHoursStart' => $settings['opening_hours_start'] ?? '09:00',
                     'openingHoursEnd' => $settings['opening_hours_end'] ?? '17:00',
                     'hideNonBusinessHours' => $settings['hide_non_business_hours'] ?? false,
+                    'monthClickAction' => $settings['month_click_action'] ?? 'day_view',
+                    'monthClickUrl' => $settings['month_click_url'] ?? '',
                 ],
                 'i18n' => [
                     'loading' => __('Loading calendar...', 'gcal-availability'),

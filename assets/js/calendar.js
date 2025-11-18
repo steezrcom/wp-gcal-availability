@@ -315,21 +315,69 @@ document.addEventListener('DOMContentLoaded', function () {
             };
         },
 
-        // Click on a date in month view to go to day view
+        // Click on a date in month view
         dateClick: function(info) {
             if (info.view.type === 'dayGridMonth') {
-                console.log('GCal Availability: date clicked, navigating to day view:', info.dateStr);
-                calendar.changeView('timeGridDay', info.date);
+                var clickAction = GcalAvailability.settings.monthClickAction || 'day_view';
+                var clickUrl = GcalAvailability.settings.monthClickUrl || '';
+
+                if (clickAction === 'redirect' && clickUrl) {
+                    // Replace {date} placeholder with clicked date
+                    var url = clickUrl.replace('{date}', info.dateStr);
+                    console.log('GCal Availability: date clicked, redirecting to:', url);
+
+                    // Check if it's an anchor link
+                    if (url.startsWith('#')) {
+                        // Scroll to anchor
+                        var element = document.querySelector(url);
+                        if (element) {
+                            element.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    } else {
+                        // Navigate to URL
+                        window.location.href = url;
+                    }
+                } else {
+                    // Default: switch to day view
+                    console.log('GCal Availability: date clicked, navigating to day view:', info.dateStr);
+                    calendar.changeView('timeGridDay', info.date);
+                }
             }
         },
 
-        // Click on an event in month view to go to day view
+        // Click on an event in month view
         eventClick: function(info) {
             if (info.view.type === 'dayGridMonth') {
                 info.jsEvent.preventDefault(); // Prevent default action
+
+                var clickAction = GcalAvailability.settings.monthClickAction || 'day_view';
+                var clickUrl = GcalAvailability.settings.monthClickUrl || '';
                 var eventDate = info.event.start;
-                console.log('GCal Availability: event clicked, navigating to day view:', eventDate);
-                calendar.changeView('timeGridDay', eventDate);
+
+                // Format date as YYYY-MM-DD
+                var dateStr = eventDate.toISOString().split('T')[0];
+
+                if (clickAction === 'redirect' && clickUrl) {
+                    // Replace {date} placeholder with event date
+                    var url = clickUrl.replace('{date}', dateStr);
+                    console.log('GCal Availability: event clicked, redirecting to:', url);
+
+                    // Check if it's an anchor link
+                    if (url.startsWith('#')) {
+                        // Scroll to anchor
+                        var element = document.querySelector(url);
+                        if (element) {
+                            element.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    } else {
+                        // Navigate to URL
+                        window.location.href = url;
+                    }
+                } else {
+                    // Default: switch to day view
+                    console.log('GCal Availability: event clicked, navigating to day view:', eventDate);
+                    calendar.changeView('timeGridDay', eventDate);
+                }
             }
         },
 
