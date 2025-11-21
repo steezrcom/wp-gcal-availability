@@ -449,10 +449,20 @@ final class Gcal_Availability {
                         $endUtc   = $this->parse_ical_datetime($current['DTEND'], $current['DTEND_TZID'] ?? null);
 
                         if ($startUtc && $endUtc) {
+                            // Check if event crosses midnight
+                            $startDate = substr($startUtc, 0, 10); // YYYY-MM-DD
+                            $endDate = substr($endUtc, 0, 10);     // YYYY-MM-DD
+
                             $event = [
                                 'start' => $startUtc,
                                 'end'   => $endUtc,
                             ];
+
+                            // Mark midnight-crossing events so they don't span days in month view
+                            if ($startDate !== $endDate) {
+                                $event['display'] = 'block';
+                                $event['classNames'] = ['gcal-midnight-crossing'];
+                            }
 
                             $events[] = $event;
                         }
@@ -1017,7 +1027,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/css/calendar.css', __FILE__),
             ['fullcalendar'],
-            '2.0.1'
+            '2.1.0'
         );
 
         wp_enqueue_script(
@@ -1032,7 +1042,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/js/calendar.js', __FILE__),
             ['fullcalendar'],
-            '2.0.1',
+            '2.1.0',
             true
         );
 

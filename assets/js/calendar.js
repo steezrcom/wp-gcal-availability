@@ -275,16 +275,37 @@ document.addEventListener('DOMContentLoaded', function () {
         eventContent: function(arg) {
             var view = arg.view.type;
             var isAllDay = arg.event.extendedProps.isAllDay;
+            var isMidnightCrossing = arg.event.classNames.includes('gcal-midnight-crossing');
 
             console.log('Event content:', {
                 title: arg.event.title,
                 view: view,
                 isAllDay: isAllDay,
+                isMidnightCrossing: isMidnightCrossing,
                 timeRange: arg.event.extendedProps.timeRange
             });
 
             // Month view: show dot + time range or "Busy" for all-day
             if (view === 'dayGridMonth') {
+                // For midnight-crossing events, show custom time range (e.g., "19:00 - 02:00")
+                if (isMidnightCrossing) {
+                    var startTime = arg.event.start;
+                    var endTime = arg.event.end;
+
+                    // Format times as HH:MM
+                    var startStr = startTime.getHours().toString().padStart(2, '0') + ':' +
+                                   startTime.getMinutes().toString().padStart(2, '0');
+                    var endStr = endTime.getHours().toString().padStart(2, '0') + ':' +
+                                 endTime.getMinutes().toString().padStart(2, '0');
+
+                    var timeRange = startStr + ' - ' + endStr;
+
+                    return {
+                        html: '<div class="fc-daygrid-event-dot" style="border-color: ' + arg.borderColor + ';"></div>' +
+                              '<div class="fc-event-time">' + timeRange + '</div>'
+                    };
+                }
+
                 // For all-day events, show dot + "Obsazeno"
                 if (isAllDay) {
                     return {
@@ -313,6 +334,30 @@ document.addEventListener('DOMContentLoaded', function () {
                 html: '<div class="fc-event-time">' + arg.timeText + '</div>' +
                       '<div class="fc-event-title">' + (arg.event.title || '') + '</div>'
             };
+        },
+
+        // Handle event mounting to prevent midnight-crossing events from spanning days in month view
+        eventDidMount: function(info) {
+            var isMidnightCrossing = info.event.classNames.includes('gcal-midnight-crossing');
+            var isMonthView = info.view.type === 'dayGridMonth';
+
+            if (isMidnightCrossing && isMonthView) {
+                // Force the event to only appear on the start date
+                // by hiding any continuation segments
+                var eventEl = info.el;
+                var eventStart = info.event.start;
+                var cellDate = info.el.closest('.fc-daygrid-day');
+
+                if (cellDate) {
+                    var cellDateStr = cellDate.getAttribute('data-date');
+                    var eventDateStr = eventStart.toISOString().split('T')[0];
+
+                    // If this is not the start date cell, hide this event segment
+                    if (cellDateStr !== eventDateStr) {
+                        eventEl.style.display = 'none';
+                    }
+                }
+            }
         },
 
         // Click on a date in month view
