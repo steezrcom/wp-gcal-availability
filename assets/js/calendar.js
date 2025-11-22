@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function () {
         slotMaxTime: slotMaxTime,
         slotDuration: '01:00',
         slotLabelInterval: '01:00',
-        slotMinHeight: 30,  // Compress time slots to 30px height (default is ~40px)
+        // Note: slotMinHeight removed in FullCalendar 6.x - height controlled via CSS
 
         // Compact view settings
         expandRows: false,
