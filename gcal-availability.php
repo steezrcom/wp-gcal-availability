@@ -1027,7 +1027,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/css/calendar.css', __FILE__),
             ['fullcalendar'],
-            '2.2.0'
+            '2.2.1'
         );
 
         wp_enqueue_script(
@@ -1042,7 +1042,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/js/calendar.js', __FILE__),
             ['fullcalendar'],
-            '2.2.0',
+            '2.2.1',
             true
         );
 
