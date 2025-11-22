@@ -18,6 +18,10 @@ yarn-error.log*
 *.zip
 *.tar.gz
 
+# Generated/minified files
+assets/css/*.min.css
+assets/js/*.min.js
+
 # Temporary files
 *.tmp
 *.bak

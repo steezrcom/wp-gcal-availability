@@ -28,6 +28,44 @@ if [ -f "$OUTPUT_FILE" ]; then
 fi
 
 echo ""
+echo -e "${BLUE}Minifying CSS and JS files...${NC}"
+
+# Minify CSS using a simple approach (remove comments, extra whitespace, newlines)
+if [ -f "assets/css/calendar.css" ]; then
+    echo "  Minifying calendar.css..."
+    # Remove comments, multiple spaces, and newlines
+    cat assets/css/calendar.css | \
+        sed 's|/\*[^*]*\*\+\([^/*][^*]*\*\+\)*/||g' | \
+        tr -s ' ' | \
+        tr -d '\n' | \
+        sed 's/[[:space:]]*{[[:space:]]*/{/g' | \
+        sed 's/[[:space:]]*}[[:space:]]*/}/g' | \
+        sed 's/[[:space:]]*:[[:space:]]*/ /g' | \
+        sed 's/[[:space:]]*;[[:space:]]*/;/g' | \
+        sed 's/[[:space:]]*,[[:space:]]*/,/g' \
+        > assets/css/calendar.min.css
+    echo "  ✓ Created calendar.min.css"
+fi
+
+# Minify JS using a simple approach (remove comments, extra whitespace, newlines)
+if [ -f "assets/js/calendar.js" ]; then
+    echo "  Minifying calendar.js..."
+    # Remove single-line comments, multiple spaces, and newlines (basic minification)
+    cat assets/js/calendar.js | \
+        sed 's|//.*$||g' | \
+        tr -s ' ' | \
+        tr -d '\n' | \
+        sed 's/[[:space:]]*{[[:space:]]*/{/g' | \
+        sed 's/[[:space:]]*}[[:space:]]*/}/g' | \
+        sed 's/[[:space:]]*([[:space:]]*/ /g' | \
+        sed 's/[[:space:]]*)[[:space:]]*/)/g' | \
+        sed 's/[[:space:]]*;[[:space:]]*/;/g' | \
+        sed 's/[[:space:]]*,[[:space:]]*/,/g' \
+        > assets/js/calendar.min.js
+    echo "  ✓ Created calendar.min.js"
+fi
+
+echo ""
 echo -e "${BLUE}Packaging files...${NC}"
 
 # Create zip with only necessary files

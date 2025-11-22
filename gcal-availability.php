@@ -1023,11 +1023,14 @@ final class Gcal_Availability {
             '6.1.15'
         );
 
+        // Use minified files in production, regular files in development
+        $suffix = (defined('SCRIPT_DEBUG') && SCRIPT_DEBUG) ? '' : '.min';
+
         wp_enqueue_style(
             'gcal-availability',
-            plugins_url('assets/css/calendar.css', __FILE__),
+            plugins_url("assets/css/calendar{$suffix}.css", __FILE__),
             ['fullcalendar'],
-            '2.2.3'
+            '2.3.0'
         );
 
         wp_enqueue_script(
@@ -1040,9 +1043,9 @@ final class Gcal_Availability {
 
         wp_enqueue_script(
             'gcal-availability',
-            plugins_url('assets/js/calendar.js', __FILE__),
+            plugins_url("assets/js/calendar{$suffix}.js", __FILE__),
             ['fullcalendar'],
-            '2.2.3',
+            '2.3.0',
             true
         );
 
