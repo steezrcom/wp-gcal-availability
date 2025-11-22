@@ -151,19 +151,18 @@ document.addEventListener('DOMContentLoaded', function () {
         handleWindowResize: true,
         windowResizeDelay: 100,
         loading: function(isLoading) {
-            var calendarWrapper = document.querySelector('.gcal-availability-wrapper');
-            var existingOverlay = calendarWrapper ? calendarWrapper.querySelector('.gcal-skeleton-overlay') : null;
+            var calendarEl = document.getElementById('gcal-availability-calendar');
+            var existingOverlay = calendarEl ? calendarEl.querySelector('.gcal-skeleton-overlay') : null;
 
             if (isLoading) {
                 debugLog('GCal Availability: loading events...');
 
-                // Show skeleton overlay
-                if (calendarWrapper && !existingOverlay) {
+                // Show skeleton overlay on calendar element only
+                if (calendarEl && !existingOverlay) {
                     var overlay = document.createElement('div');
                     overlay.className = 'gcal-skeleton-overlay';
                     overlay.innerHTML = '<div class="gcal-skeleton-spinner"></div>';
-                    calendarWrapper.style.position = 'relative';
-                    calendarWrapper.appendChild(overlay);
+                    calendarEl.appendChild(overlay);
                 }
             } else {
                 debugLog('GCal Availability: events loaded');
