@@ -30,21 +30,49 @@ fi
 echo ""
 echo -e "${BLUE}Minifying CSS and JS files...${NC}"
 
-# Minify CSS using a simple approach (remove comments, extra whitespace, newlines)
+# Minify CSS using csso-cli (proper minification with optimization)
 if [ -f "assets/css/calendar.css" ]; then
-    echo "  Minifying calendar.css..."
-    # Remove comments, multiple spaces, and newlines
-    cat assets/css/calendar.css | \
-        sed 's|/\*[^*]*\*\+\([^/*][^*]*\*\+\)*/||g' | \
-        tr -s ' ' | \
-        tr -d '\n' | \
-        sed 's/[[:space:]]*{[[:space:]]*/{/g' | \
-        sed 's/[[:space:]]*}[[:space:]]*/}/g' | \
-        sed 's/[[:space:]]*:[[:space:]]*/ /g' | \
-        sed 's/[[:space:]]*;[[:space:]]*/;/g' | \
-        sed 's/[[:space:]]*,[[:space:]]*/,/g' \
-        > assets/css/calendar.min.css
-    echo "  ✓ Created calendar.min.css"
+    echo "  Minifying calendar.css with csso..."
+
+    # Check if npx is available
+    if command -v npx &> /dev/null; then
+        # Use csso-cli via npx for proper CSS minification and optimization
+        npx -y csso-cli assets/css/calendar.css \
+            --output assets/css/calendar.min.css \
+            2>/dev/null
+
+        if [ $? -eq 0 ]; then
+            echo "  ✓ Created calendar.min.css (csso - fully optimized)"
+        else
+            echo "  ⚠ CSSO failed, falling back to basic minification..."
+            # Fallback to basic minification
+            cat assets/css/calendar.css | \
+                sed 's|/\*[^*]*\*\+\([^/*][^*]*\*\+\)*/||g' | \
+                tr -s ' ' | \
+                tr -d '\n' | \
+                sed 's/[[:space:]]*{[[:space:]]*/{/g' | \
+                sed 's/[[:space:]]*}[[:space:]]*/}/g' | \
+                sed 's/[[:space:]]*:[[:space:]]*/ /g' | \
+                sed 's/[[:space:]]*;[[:space:]]*/;/g' | \
+                sed 's/[[:space:]]*,[[:space:]]*/,/g' \
+                > assets/css/calendar.min.css
+            echo "  ✓ Created calendar.min.css (basic minification)"
+        fi
+    else
+        echo "  ⚠ npx not found, using basic minification..."
+        # Fallback to basic minification
+        cat assets/css/calendar.css | \
+            sed 's|/\*[^*]*\*\+\([^/*][^*]*\*\+\)*/||g' | \
+            tr -s ' ' | \
+            tr -d '\n' | \
+            sed 's/[[:space:]]*{[[:space:]]*/{/g' | \
+            sed 's/[[:space:]]*}[[:space:]]*/}/g' | \
+            sed 's/[[:space:]]*:[[:space:]]*/ /g' | \
+            sed 's/[[:space:]]*;[[:space:]]*/;/g' | \
+            sed 's/[[:space:]]*,[[:space:]]*/,/g' \
+            > assets/css/calendar.min.css
+        echo "  ✓ Created calendar.min.css (basic minification)"
+    fi
 fi
 
 # Minify JS using terser (proper minification with obfuscation)
