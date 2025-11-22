@@ -91,12 +91,14 @@
     cursor: pointer;
 }
 
-/* Hide all-day row in week/day views since we convert all-day events to full-day timed blocks */
-.gcal-availability-wrapper .fc-timegrid .fc-scrollgrid-section-header {
+/* Hide only the all-day row in week/day views (not the day headers) */
+/* The all-day row is in the .fc-daygrid-body section */
+.gcal-availability-wrapper .fc-timegrid .fc-daygrid-body {
     display: none !important;
 }
 
-.gcal-availability-wrapper .fc-timegrid .fc-daygrid-body {
+/* Also hide the all-day row container if it exists */
+.gcal-availability-wrapper .fc-timegrid .fc-scrollgrid-section.fc-scrollgrid-section-body:first-child {
     display: none !important;
 }
 
