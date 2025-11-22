@@ -180,6 +180,17 @@
         font-size: 0.85em;
     }
 
+    /* Hide event title (Obsazeno/Busy) in mobile WEEK view only - keep it in day view */
+    .gcal-availability-wrapper .fc-timeGridWeek-view .fc-timegrid-event .fc-event-title {
+        display: none !important;
+    }
+
+    /* Make sure event time is still visible in week view */
+    .gcal-availability-wrapper .fc-timeGridWeek-view .fc-timegrid-event .fc-event-time {
+        display: block !important;
+        font-size: 0.9em !important;
+    }
+
     /* Convert dot events to block events on mobile for better visibility */
     .gcal-availability-wrapper .fc-daygrid-event-dot {
         display: none !important;
