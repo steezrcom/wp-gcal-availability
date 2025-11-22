@@ -47,22 +47,54 @@ if [ -f "assets/css/calendar.css" ]; then
     echo "  ✓ Created calendar.min.css"
 fi
 
-# Minify JS using a simple approach (remove comments, extra whitespace, newlines)
+# Minify JS using terser (proper minification with obfuscation)
 if [ -f "assets/js/calendar.js" ]; then
-    echo "  Minifying calendar.js..."
-    # Remove single-line comments, multiple spaces, and newlines (basic minification)
-    cat assets/js/calendar.js | \
-        sed 's|//.*$||g' | \
-        tr -s ' ' | \
-        tr -d '\n' | \
-        sed 's/[[:space:]]*{[[:space:]]*/{/g' | \
-        sed 's/[[:space:]]*}[[:space:]]*/}/g' | \
-        sed 's/[[:space:]]*([[:space:]]*/ /g' | \
-        sed 's/[[:space:]]*)[[:space:]]*/)/g' | \
-        sed 's/[[:space:]]*;[[:space:]]*/;/g' | \
-        sed 's/[[:space:]]*,[[:space:]]*/,/g' \
-        > assets/js/calendar.min.js
-    echo "  ✓ Created calendar.min.js"
+    echo "  Minifying calendar.js with terser..."
+
+    # Check if terser is available
+    if command -v npx &> /dev/null; then
+        # Use terser via npx for proper minification and obfuscation
+        npx -y terser assets/js/calendar.js \
+            --compress \
+            --mangle \
+            --mangle-props regex=/^_/ \
+            --output assets/js/calendar.min.js \
+            2>/dev/null
+
+        if [ $? -eq 0 ]; then
+            echo "  ✓ Created calendar.min.js (terser - fully minified & obfuscated)"
+        else
+            echo "  ⚠ Terser failed, falling back to basic minification..."
+            # Fallback to basic minification
+            cat assets/js/calendar.js | \
+                sed 's|//.*$||g' | \
+                tr -s ' ' | \
+                tr -d '\n' | \
+                sed 's/[[:space:]]*{[[:space:]]*/{/g' | \
+                sed 's/[[:space:]]*}[[:space:]]*/}/g' | \
+                sed 's/[[:space:]]*([[:space:]]*/ /g' | \
+                sed 's/[[:space:]]*)[[:space:]]*/)/g' | \
+                sed 's/[[:space:]]*;[[:space:]]*/;/g' | \
+                sed 's/[[:space:]]*,[[:space:]]*/,/g' \
+                > assets/js/calendar.min.js
+            echo "  ✓ Created calendar.min.js (basic minification)"
+        fi
+    else
+        echo "  ⚠ npx not found, using basic minification..."
+        # Fallback to basic minification
+        cat assets/js/calendar.js | \
+            sed 's|//.*$||g' | \
+            tr -s ' ' | \
+            tr -d '\n' | \
+            sed 's/[[:space:]]*{[[:space:]]*/{/g' | \
+            sed 's/[[:space:]]*}[[:space:]]*/}/g' | \
+            sed 's/[[:space:]]*([[:space:]]*/ /g' | \
+            sed 's/[[:space:]]*)[[:space:]]*/)/g' | \
+            sed 's/[[:space:]]*;[[:space:]]*/;/g' | \
+            sed 's/[[:space:]]*,[[:space:]]*/,/g' \
+            > assets/js/calendar.min.js
+        echo "  ✓ Created calendar.min.js (basic minification)"
+    fi
 fi
 
 echo ""
