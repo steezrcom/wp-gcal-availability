@@ -1023,14 +1023,13 @@ final class Gcal_Availability {
             '6.1.15'
         );
 
-        // Use minified files in production, regular files in development
-        $suffix = (defined('SCRIPT_DEBUG') && SCRIPT_DEBUG) ? '' : '.min';
-
+        // Use minified files (only minified versions are included in production package)
+        // For development, keep non-minified files in your local repo
         wp_enqueue_style(
             'gcal-availability',
-            plugins_url("assets/css/calendar{$suffix}.css", __FILE__),
+            plugins_url('assets/css/calendar.min.css', __FILE__),
             ['fullcalendar'],
-            '2.3.0'
+            '2.3.1'
         );
 
         wp_enqueue_script(
@@ -1043,9 +1042,9 @@ final class Gcal_Availability {
 
         wp_enqueue_script(
             'gcal-availability',
-            plugins_url("assets/js/calendar{$suffix}.js", __FILE__),
+            plugins_url('assets/js/calendar.min.js', __FILE__),
             ['fullcalendar'],
-            '2.3.0',
+            '2.3.1',
             true
         );
 

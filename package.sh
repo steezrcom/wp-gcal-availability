@@ -68,7 +68,7 @@ fi
 echo ""
 echo -e "${BLUE}Packaging files...${NC}"
 
-# Create zip with only necessary files
+# Create zip with only necessary files (exclude non-minified CSS/JS)
 zip -r "$OUTPUT_FILE" \
     gcal-availability.php \
     uninstall.php \
@@ -77,7 +77,8 @@ zip -r "$OUTPUT_FILE" \
     assets/ \
     includes/ \
     languages/ \
-    -x "*.git*" "*.DS_Store" "node_modules/*" "*.zip" "docs/*"
+    -x "*.git*" "*.DS_Store" "node_modules/*" "*.zip" "docs/*" \
+    -x "assets/css/calendar.css" "assets/js/calendar.js"
 
 echo ""
 if [ -f "$OUTPUT_FILE" ]; then
