@@ -1,10 +1,17 @@
 /**
  * GCal Availability - Custom Styles
  * Version: 1.1.0
+ *
+ * All styles are scoped under .gcal-availability-wrapper to prevent conflicts with other plugins
  */
 
+/* Calendar wrapper */
+.gcal-availability-wrapper {
+    /* Wrapper styles if needed */
+}
+
 /* Calendar container */
-#gcal-availability-calendar {
+.gcal-availability-wrapper #gcal-availability-calendar {
     max-width: 900px;
     margin: 0 auto;
     padding: 20px;
@@ -12,12 +19,12 @@
 }
 
 /* Make calendar adapt to site background */
-#gcal-availability-calendar .fc {
+.gcal-availability-wrapper #gcal-availability-calendar .fc {
     background: transparent;
 }
 
 /* Loading state */
-.gcal-loading {
+.gcal-availability-wrapper .gcal-loading {
     padding: 40px;
     text-align: center;
     color: #666;
@@ -26,19 +33,19 @@
     border: 1px solid #e5e7eb;
 }
 
-.gcal-loading > div:first-child {
+.gcal-availability-wrapper .gcal-loading > div:first-child {
     font-size: 24px;
     margin-bottom: 10px;
-    animation: pulse 1.5s ease-in-out infinite;
+    animation: gcal-pulse 1.5s ease-in-out infinite;
 }
 
-@keyframes pulse {
+@keyframes gcal-pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
 }
 
 /* Error state */
-.gcal-error {
+.gcal-availability-wrapper .gcal-error {
     padding: 20px;
     background: #fef2f2;
     border: 1px solid #fecaca;
@@ -47,136 +54,136 @@
     text-align: center;
 }
 
-.gcal-error > div:first-child {
+.gcal-availability-wrapper .gcal-error > div:first-child {
     font-size: 24px;
     margin-bottom: 10px;
 }
 
 /* Busy event styling */
-.gcal-busy-event {
+.gcal-availability-wrapper .gcal-busy-event {
     cursor: default;
     font-weight: 500;
 }
 
 /* Month view day backgrounds - cleaner look with subtle colors */
-.fc-daygrid-day {
+.gcal-availability-wrapper .fc-daygrid-day {
     position: relative;
 }
 
 /* Business hours styling - make non-business hours darker/grayed out */
-.fc-non-business {
+.gcal-availability-wrapper .fc-non-business {
     background-color: rgba(0, 0, 0, 0.05) !important;
 }
 
 /* On dark themes, make non-business hours even darker */
 @media (prefers-color-scheme: dark) {
-    .fc-non-business {
+    .gcal-availability-wrapper .fc-non-business {
         background-color: rgba(0, 0, 0, 0.3) !important;
     }
 }
 
 /* Clickable dates and events in month view */
-.fc-daygrid-day {
+.gcal-availability-wrapper .fc-daygrid-day {
     cursor: pointer;
 }
 
-.fc-daygrid-event {
+.gcal-availability-wrapper .fc-daygrid-event {
     cursor: pointer;
 }
 
 /* Hide all-day row in week/day views since we convert all-day events to full-day timed blocks */
-.fc-timegrid .fc-scrollgrid-section-header {
+.gcal-availability-wrapper .fc-timegrid .fc-scrollgrid-section-header {
     display: none !important;
 }
 
-.fc-timegrid .fc-daygrid-body {
+.gcal-availability-wrapper .fc-timegrid .fc-daygrid-body {
     display: none !important;
 }
 
 /* All-day events styling */
-.fc-daygrid-event.fc-event-start.fc-event-end {
+.gcal-availability-wrapper .fc-daygrid-event.fc-event-start.fc-event-end {
     /* Full block style for all-day events */
 }
 
-.fc-timegrid .fc-event.fc-event-start.fc-event-end {
+.gcal-availability-wrapper .fc-timegrid .fc-event.fc-event-start.fc-event-end {
     /* All-day events in week/day view */
 }
 
 /* Compact time slots in week/day views */
-.fc-timegrid-slot {
+.gcal-availability-wrapper .fc-timegrid-slot {
     height: 30px !important;  /* Compress to 30px (was 2.5em ~40px) */
     min-height: 30px !important;
 }
 
-.fc-timegrid-slot-label {
+.gcal-availability-wrapper .fc-timegrid-slot-label {
     vertical-align: middle !important;
     font-size: 0.85em;
     padding: 0 4px !important;
 }
 
 /* Compress time axis */
-.fc-timegrid-axis {
+.gcal-availability-wrapper .fc-timegrid-axis {
     width: 45px !important;
 }
 
 /* Reduce padding in time grid cells */
-.fc-timegrid-slot-lane {
+.gcal-availability-wrapper .fc-timegrid-slot-lane {
     border-top: 1px solid #e5e7eb;
 }
 
 /* Make events more compact */
-.fc-timegrid-event {
+.gcal-availability-wrapper .fc-timegrid-event {
     padding: 2px 4px !important;
 }
 
-.fc-timegrid-event .fc-event-time {
+.gcal-availability-wrapper .fc-timegrid-event .fc-event-time {
     font-size: 0.85em;
 }
 
-.fc-timegrid-event .fc-event-title {
+.gcal-availability-wrapper .fc-timegrid-event .fc-event-title {
     font-size: 0.9em;
 }
 
 /* Mobile responsive styles */
 @media (max-width: 768px) {
     /* Make calendar container responsive */
-    #gcal-availability-calendar {
+    .gcal-availability-wrapper #gcal-availability-calendar {
         font-size: 13px;
     }
 
     /* Compact toolbar on mobile */
-    .fc .fc-toolbar {
+    .gcal-availability-wrapper .fc .fc-toolbar {
         flex-direction: column;
         gap: 10px;
     }
 
-    .fc .fc-toolbar-chunk {
+    .gcal-availability-wrapper .fc .fc-toolbar-chunk {
         display: flex;
         justify-content: center;
     }
 
     /* Smaller buttons on mobile */
-    .fc .fc-button {
+    .gcal-availability-wrapper .fc .fc-button {
         padding: 0.3em 0.5em;
         font-size: 0.9em;
     }
 
     /* Compact time slots on mobile */
-    .fc-timegrid-slot {
+    .gcal-availability-wrapper .fc-timegrid-slot {
         height: 2em !important;
     }
 
     /* Smaller event text on mobile */
-    .fc-event {
+    .gcal-availability-wrapper .fc-event {
         font-size: 0.85em;
     }
 
     /* Convert dot events to block events on mobile for better visibility */
-    .fc-daygrid-event-dot {
+    .gcal-availability-wrapper .fc-daygrid-event-dot {
         display: none !important;
     }
 
-    .fc-daygrid-dot-event {
+    .gcal-availability-wrapper .fc-daygrid-dot-event {
         background-color: #ef4444 !important;
         border: 1px solid #dc2626 !important;
         border-radius: 4px !important;
@@ -188,7 +195,7 @@
         text-overflow: ellipsis !important;
     }
 
-    .fc-daygrid-dot-event .fc-event-time {
+    .gcal-availability-wrapper .fc-daygrid-dot-event .fc-event-time {
         color: #ffffff !important;
         font-weight: 600 !important;
         display: inline !important;
@@ -197,47 +204,47 @@
         line-height: 1.2 !important;
     }
 
-    .fc-daygrid-dot-event .fc-event-title {
+    .gcal-availability-wrapper .fc-daygrid-dot-event .fc-event-title {
         display: none !important;
     }
 
     /* Make day cells taller to accommodate block events */
-    .fc-daygrid-day-frame {
+    .gcal-availability-wrapper .fc-daygrid-day-frame {
         min-height: 100px !important;
     }
 
-    .fc-daygrid-day-events {
+    .gcal-availability-wrapper .fc-daygrid-day-events {
         margin-top: 2px !important;
     }
 
     /* Hide time labels on very small screens */
     @media (max-width: 480px) {
-        .fc-timegrid-slot-label {
+        .gcal-availability-wrapper .fc-timegrid-slot-label {
             font-size: 0.75em;
         }
 
-        .fc .fc-toolbar-title {
+        .gcal-availability-wrapper .fc .fc-toolbar-title {
             font-size: 1.2em;
         }
 
         /* Even more compact on very small screens */
-        .fc-daygrid-day-frame {
+        .gcal-availability-wrapper .fc-daygrid-day-frame {
             min-height: 90px !important;
         }
 
-        .fc-daygrid-dot-event {
+        .gcal-availability-wrapper .fc-daygrid-dot-event {
             font-size: 0.8em !important;
             padding: 3px 5px !important;
         }
 
-        .fc-daygrid-dot-event .fc-event-time {
+        .gcal-availability-wrapper .fc-daygrid-dot-event .fc-event-time {
             font-size: 0.9em !important;
         }
     }
 }
 
 /* Make sure day numbers are visible on colored backgrounds */
-.fc .fc-daygrid-day-number {
+.gcal-availability-wrapper .fc .fc-daygrid-day-number {
     position: relative;
     z-index: 2;
     color: inherit;
@@ -246,11 +253,11 @@
 }
 
 /* Today styling - make it stand out */
-.fc .fc-daygrid-day.fc-day-today {
+.gcal-availability-wrapper .fc .fc-daygrid-day.fc-day-today {
     background-color: rgba(59, 130, 246, 0.2) !important;
 }
 
-.fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
+.gcal-availability-wrapper .fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
     background-color: #3b82f6;
     color: white;
     border-radius: 50%;
@@ -264,17 +271,17 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    #gcal-availability-calendar {
+    .gcal-availability-wrapper #gcal-availability-calendar {
         font-size: 14px;
     }
 
-    .fc-toolbar-title {
+    .gcal-availability-wrapper .fc-toolbar-title {
         font-size: 1.2em !important;
     }
 }
 
 /* FullCalendar overrides for better appearance */
-.fc {
+.gcal-availability-wrapper .fc {
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
@@ -282,13 +289,13 @@
     backdrop-filter: blur(10px);
 }
 
-.fc .fc-toolbar-title {
+.gcal-availability-wrapper .fc .fc-toolbar-title {
     font-size: 1.5em;
     font-weight: 600;
     color: inherit;
 }
 
-.fc .fc-button {
+.gcal-availability-wrapper .fc .fc-button {
     background-color: #3b82f6;
     border-color: #3b82f6;
     text-transform: capitalize;
@@ -298,37 +305,37 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
-.fc .fc-button:hover {
+.gcal-availability-wrapper .fc .fc-button:hover {
     background-color: #2563eb;
     border-color: #2563eb;
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
-.fc .fc-button:disabled {
+.gcal-availability-wrapper .fc .fc-button:disabled {
     background-color: #6b7280;
     border-color: #6b7280;
     opacity: 0.5;
 }
 
-.fc .fc-button-primary:not(:disabled):active,
-.fc .fc-button-primary:not(:disabled).fc-button-active {
+.gcal-availability-wrapper .fc .fc-button-primary:not(:disabled):active,
+.gcal-availability-wrapper .fc .fc-button-primary:not(:disabled).fc-button-active {
     background-color: #1d4ed8;
     border-color: #1d4ed8;
 }
 
-.fc-theme-standard td,
-.fc-theme-standard th {
+.gcal-availability-wrapper .fc-theme-standard td,
+.gcal-availability-wrapper .fc-theme-standard th {
     border-color: rgba(255, 255, 255, 0.1);
 }
 
-.fc-theme-standard .fc-scrollgrid {
+.gcal-availability-wrapper .fc-theme-standard .fc-scrollgrid {
     border-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Day number styling is handled above */
 
-.fc .fc-col-header-cell {
+.gcal-availability-wrapper .fc .fc-col-header-cell {
     background-color: rgba(255, 255, 255, 0.05);
     font-weight: 600;
     text-transform: uppercase;
@@ -340,72 +347,72 @@
 }
 
 /* Day cells */
-.fc .fc-daygrid-day {
+.gcal-availability-wrapper .fc .fc-daygrid-day {
     background-color: rgba(0, 0, 0, 0.2);
 }
 
-.fc .fc-daygrid-day:hover {
+.gcal-availability-wrapper .fc .fc-daygrid-day:hover {
     background-color: rgba(255, 255, 255, 0.05);
 }
 
 /* Event styling */
-.fc-event {
+.gcal-availability-wrapper .fc-event {
     border-radius: 4px;
     padding: 2px 4px;
     margin: 1px 2px;
 }
 
-.fc-daygrid-event {
+.gcal-availability-wrapper .fc-daygrid-event {
     white-space: normal;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .fc .fc-toolbar {
+    .gcal-availability-wrapper .fc .fc-toolbar {
         flex-direction: column;
         gap: 10px;
     }
-    
-    .fc .fc-toolbar-title {
+
+    .gcal-availability-wrapper .fc .fc-toolbar-title {
         font-size: 1.25em;
         margin: 10px 0;
     }
-    
-    .fc .fc-button {
+
+    .gcal-availability-wrapper .fc .fc-button {
         padding: 0.4em 0.8em;
         font-size: 0.9em;
     }
-    
-    .fc .fc-toolbar-chunk {
+
+    .gcal-availability-wrapper .fc .fc-toolbar-chunk {
         display: flex;
         justify-content: center;
     }
 }
 
 @media (max-width: 480px) {
-    .fc .fc-toolbar-title {
+    .gcal-availability-wrapper .fc .fc-toolbar-title {
         font-size: 1.1em;
     }
-    
-    .fc .fc-button {
+
+    .gcal-availability-wrapper .fc .fc-button {
         padding: 0.3em 0.6em;
         font-size: 0.85em;
     }
-    
-    .fc .fc-daygrid-day-number {
+
+    .gcal-availability-wrapper .fc .fc-daygrid-day-number {
         padding: 4px;
         font-size: 0.9em;
     }
 }
 
 /* CTA Button Styling */
-.gcal-cta-container {
+.gcal-availability-wrapper .gcal-cta-container {
     margin-top: 20px;
     text-align: center;
     padding: 15px 0;
 }
 
-.gcal-cta-button {
+.gcal-availability-wrapper .gcal-cta-button {
     display: inline-block;
     padding: 12px 32px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -420,37 +427,37 @@
     border: none;
 }
 
-.gcal-cta-button:hover {
+.gcal-availability-wrapper .gcal-cta-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
     background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
 }
 
-.gcal-cta-button:active {
+.gcal-availability-wrapper .gcal-cta-button:active {
     transform: translateY(0);
     box-shadow: 0 2px 10px rgba(102, 126, 234, 0.4);
 }
 
 /* Dark theme support */
 @media (prefers-color-scheme: dark) {
-    .gcal-cta-button {
+    .gcal-availability-wrapper .gcal-cta-button {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
     }
 
-    .gcal-cta-button:hover {
+    .gcal-availability-wrapper .gcal-cta-button:hover {
         box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
     }
 }
 
 /* Mobile responsive */
 @media (max-width: 768px) {
-    .gcal-cta-container {
+    .gcal-availability-wrapper .gcal-cta-container {
         margin-top: 15px;
         padding: 10px 0;
     }
 
-    .gcal-cta-button {
+    .gcal-availability-wrapper .gcal-cta-button {
         padding: 10px 24px;
         font-size: 14px;
         width: 90%;

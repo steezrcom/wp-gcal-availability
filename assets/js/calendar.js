@@ -492,7 +492,15 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             ctaContainer.appendChild(ctaButton);
-            element.parentNode.insertBefore(ctaContainer, element.nextSibling);
+
+            // Insert CTA button inside the wrapper (after the calendar element)
+            var wrapper = element.parentNode;
+            if (wrapper && wrapper.classList.contains('gcal-availability-wrapper')) {
+                wrapper.appendChild(ctaContainer);
+            } else {
+                // Fallback: insert after calendar element if wrapper not found
+                element.parentNode.insertBefore(ctaContainer, element.nextSibling);
+            }
 
             // Function to update CTA button text based on current view
             function updateCtaButton() {

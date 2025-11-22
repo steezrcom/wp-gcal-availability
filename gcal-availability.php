@@ -1027,7 +1027,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/css/calendar.css', __FILE__),
             ['fullcalendar'],
-            '2.1.1'
+            '2.2.0'
         );
 
         wp_enqueue_script(
@@ -1042,7 +1042,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/js/calendar.js', __FILE__),
             ['fullcalendar'],
-            '2.1.1',
+            '2.2.0',
             true
         );
 
@@ -1100,12 +1100,15 @@ final class Gcal_Availability {
             $output .= '<style>' . wp_strip_all_tags($atts['custom_css']) . '</style>';
         }
 
+        // Wrap calendar in a unique container to scope CSS
+        $output .= '<div class="gcal-availability-wrapper">';
         $output .= sprintf(
             '<div id="gcal-availability-calendar" data-initial-view="%s" data-locale="%s" data-first-day="%s"></div>',
             esc_attr($atts['initial_view']),
             esc_attr($atts['locale']),
             esc_attr($atts['first_day'])
         );
+        $output .= '</div>';
 
         return $output;
     }
