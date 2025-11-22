@@ -271,6 +271,41 @@ document.addEventListener('DOMContentLoaded', function () {
         eventClassNames: 'gcal-busy-event',
         dayMaxEvents: true,
         nowIndicator: true,
+
+        // Transform events before rendering to prevent midnight-crossing events from spanning in month view
+        eventDataTransform: function(eventData) {
+            // Check if event crosses midnight
+            var start = new Date(eventData.start);
+            var end = new Date(eventData.end);
+
+            var startDate = start.toISOString().split('T')[0];
+            var endDate = end.toISOString().split('T')[0];
+
+            if (startDate !== endDate) {
+                // Mark as midnight-crossing
+                if (!eventData.classNames) {
+                    eventData.classNames = [];
+                }
+                if (Array.isArray(eventData.classNames)) {
+                    eventData.classNames.push('gcal-midnight-crossing');
+                }
+
+                // Store original end time in extendedProps
+                if (!eventData.extendedProps) {
+                    eventData.extendedProps = {};
+                }
+                eventData.extendedProps.originalEnd = eventData.end;
+
+                // For month view display, set end to same day as start
+                // This prevents the event from spanning multiple days
+                // We set it to start time + 1 hour as a placeholder (won't be displayed)
+                var adjustedEnd = new Date(start);
+                adjustedEnd.setHours(start.getHours() + 1);
+                eventData.end = adjustedEnd.toISOString();
+            }
+
+            return eventData;
+        },
         // Customize event content
         eventContent: function(arg) {
             var view = arg.view.type;
@@ -290,7 +325,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 // For midnight-crossing events, show custom time range (e.g., "19:00 - 02:00")
                 if (isMidnightCrossing) {
                     var startTime = arg.event.start;
-                    var endTime = arg.event.end;
+                    // Use original end time from extendedProps
+                    var originalEndStr = arg.event.extendedProps.originalEnd;
+                    var endTime = originalEndStr ? new Date(originalEndStr) : arg.event.end;
 
                     // Format times as HH:MM
                     var startStr = startTime.getHours().toString().padStart(2, '0') + ':' +
@@ -334,30 +371,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 html: '<div class="fc-event-time">' + arg.timeText + '</div>' +
                       '<div class="fc-event-title">' + (arg.event.title || '') + '</div>'
             };
-        },
-
-        // Handle event mounting to prevent midnight-crossing events from spanning days in month view
-        eventDidMount: function(info) {
-            var isMidnightCrossing = info.event.classNames.includes('gcal-midnight-crossing');
-            var isMonthView = info.view.type === 'dayGridMonth';
-
-            if (isMidnightCrossing && isMonthView) {
-                // Force the event to only appear on the start date
-                // by hiding any continuation segments
-                var eventEl = info.el;
-                var eventStart = info.event.start;
-                var cellDate = info.el.closest('.fc-daygrid-day');
-
-                if (cellDate) {
-                    var cellDateStr = cellDate.getAttribute('data-date');
-                    var eventDateStr = eventStart.toISOString().split('T')[0];
-
-                    // If this is not the start date cell, hide this event segment
-                    if (cellDateStr !== eventDateStr) {
-                        eventEl.style.display = 'none';
-                    }
-                }
-            }
         },
 
         // Click on a date in month view
