@@ -1,3 +1,16 @@
+// Debug logging helpers - only log when debug is enabled in settings
+function debugLog() {
+    if (typeof GcalAvailability !== 'undefined' && GcalAvailability.settings && GcalAvailability.settings.enableDebug) {
+        console.log.apply(console, arguments);
+    }
+}
+
+function debugError() {
+    if (typeof GcalAvailability !== 'undefined' && GcalAvailability.settings && GcalAvailability.settings.enableDebug) {
+        console.error.apply(console, arguments);
+    }
+}
+
 // Helper function to convert time string (HH:MM) to minutes since midnight
 function timeToMinutes(timeStr) {
     var parts = timeStr.split(':');
@@ -31,16 +44,16 @@ document.addEventListener('DOMContentLoaded', function () {
     var element = document.getElementById('gcal-availability-calendar');
 
     if (!element) {
-        console.error('GCal Availability: element #gcal-availability-calendar not found');
+        debugError('GCal Availability: element #gcal-availability-calendar not found');
         return;
     }
 
     if (typeof FullCalendar === 'undefined') {
-        console.error('GCal Availability: FullCalendar is not loaded');
+        debugError('GCal Availability: FullCalendar is not loaded');
         return;
     }
 
-    console.log('GCal Availability: init calendar on', element);
+    debugLog('GCal Availability: init calendar on', element);
 
     // Get configuration from data attributes
     var initialView = element.getAttribute('data-initial-view') || 'dayGridMonth';
@@ -66,22 +79,22 @@ document.addEventListener('DOMContentLoaded', function () {
         // slotMinTime/slotMaxTime crossing midnight
         slotMinTime = '00:00';
         slotMaxTime = '24:00';
-        console.log('GCal Availability: opening hours', openingStart, 'to', openingEnd,
+        debugLog('GCal Availability: opening hours', openingStart, 'to', openingEnd,
                     '(crosses midnight - showing full day)');
     } else if (hideNonBusinessHours) {
         // Hide non-business hours: only show business hours (no buffer)
         slotMinTime = openingStart;
         slotMaxTime = openingEnd;
-        console.log('GCal Availability: opening hours', openingStart, 'to', openingEnd,
+        debugLog('GCal Availability: opening hours', openingStart, 'to', openingEnd,
                     '(hiding non-business hours)');
     } else {
         // Normal hours: show 1 hour before/after
         slotMinTime = subtractHour(openingStart);
         slotMaxTime = addHour(openingEnd);
-        console.log('GCal Availability: opening hours', openingStart, 'to', openingEnd);
+        debugLog('GCal Availability: opening hours', openingStart, 'to', openingEnd);
     }
 
-    console.log('GCal Availability: slot times', slotMinTime, 'to', slotMaxTime);
+    debugLog('GCal Availability: slot times', slotMinTime, 'to', slotMaxTime);
 
     // Show loading state
     element.innerHTML = '<div class="gcal-loading" style="padding: 40px; text-align: center; color: #666;">' +
@@ -139,16 +152,16 @@ document.addEventListener('DOMContentLoaded', function () {
         windowResizeDelay: 100,
         loading: function(isLoading) {
             if (isLoading) {
-                console.log('GCal Availability: loading events...');
+                debugLog('GCal Availability: loading events...');
             } else {
-                console.log('GCal Availability: events loaded');
+                debugLog('GCal Availability: events loaded');
             }
         },
         // Simple event source - just show busy blocks
         events: function (info, successCallback, failureCallback) {
                     // Safety check - info should always be defined
                     if (!info || !info.startStr || !info.endStr) {
-                        console.error('GCal Availability: invalid info object', info);
+                        debugError('GCal Availability: invalid info object', info);
                         failureCallback(new Error('Invalid date range'));
                         return;
                     }
@@ -160,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         + '?start=' + encodeURIComponent(startDate)
                         + '&end=' + encodeURIComponent(endDate);
 
-                    console.log('GCal Availability: fetching', url);
+                    debugLog('GCal Availability: fetching', url);
 
                     fetch(url, {
                         method: 'GET',
@@ -184,11 +197,11 @@ document.addEventListener('DOMContentLoaded', function () {
                                 throw new Error(data.error);
                             }
 
-                            console.log('GCal Availability: data from API', data);
+                            debugLog('GCal Availability: data from API', data);
 
                             // Simply show all events as busy blocks
                             var events = (data || []).map(function (block) {
-                                console.log('GCal Availability: busy block', block.start, 'to', block.end, 'allDay:', block.allDay);
+                                debugLog('GCal Availability: busy block', block.start, 'to', block.end, 'allDay:', block.allDay);
 
                                 var timeRange;
                                 var title;
@@ -239,12 +252,12 @@ document.addEventListener('DOMContentLoaded', function () {
                                 };
                             });
 
-                            console.log('GCal Availability: total events:', events.length);
+                            debugLog('GCal Availability: total events:', events.length);
 
                             successCallback(events);
                         })
                         .catch(function (error) {
-                            console.error('GCal Availability: error loading availability', error);
+                            debugError('GCal Availability: error loading availability', error);
 
                             // Show error message to user
                             var errorMsg = GcalAvailability.i18n.error || 'Failed to load calendar. Please try again later.';
@@ -312,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function () {
             var isAllDay = arg.event.extendedProps.isAllDay;
             var isMidnightCrossing = arg.event.classNames.includes('gcal-midnight-crossing');
 
-            console.log('Event content:', {
+            debugLog('Event content:', {
                 title: arg.event.title,
                 view: view,
                 isAllDay: isAllDay,
@@ -382,7 +395,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (clickAction === 'redirect' && clickUrl) {
                     // Replace {date} placeholder with clicked date
                     var url = clickUrl.replace('{date}', info.dateStr);
-                    console.log('GCal Availability: date clicked, redirecting to:', url);
+                    debugLog('GCal Availability: date clicked, redirecting to:', url);
 
                     // Check if it's an anchor link
                     if (url.startsWith('#')) {
@@ -397,7 +410,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 } else {
                     // Default: switch to day view
-                    console.log('GCal Availability: date clicked, navigating to day view:', info.dateStr);
+                    debugLog('GCal Availability: date clicked, navigating to day view:', info.dateStr);
                     calendar.changeView('timeGridDay', info.date);
                 }
             }
@@ -418,7 +431,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (clickAction === 'redirect' && clickUrl) {
                     // Replace {date} placeholder with event date
                     var url = clickUrl.replace('{date}', dateStr);
-                    console.log('GCal Availability: event clicked, redirecting to:', url);
+                    debugLog('GCal Availability: event clicked, redirecting to:', url);
 
                     // Check if it's an anchor link
                     if (url.startsWith('#')) {
@@ -433,7 +446,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 } else {
                     // Default: switch to day view
-                    console.log('GCal Availability: event clicked, navigating to day view:', eventDate);
+                    debugLog('GCal Availability: event clicked, navigating to day view:', eventDate);
                     calendar.changeView('timeGridDay', eventDate);
                 }
             }
@@ -448,7 +461,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     try {
         calendar.render();
-        console.log('GCal Availability: calendar rendered successfully');
+        debugLog('GCal Availability: calendar rendered successfully');
 
         // Add CTA button if enabled
         if (GcalAvailability.settings.showCtaButton &&
@@ -476,7 +489,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 var buttonText = GcalAvailability.settings.ctaButtonText.replace('{date}', dateStr);
                 ctaButton.textContent = buttonText;
 
-                console.log('GCal Availability: CTA button clicked, navigating to:', url);
+                debugLog('GCal Availability: CTA button clicked, navigating to:', url);
 
                 // Check if it's an anchor link
                 if (url.startsWith('#')) {
@@ -518,7 +531,7 @@ document.addEventListener('DOMContentLoaded', function () {
             updateCtaButton();
         }
     } catch (error) {
-        console.error('GCal Availability: failed to render calendar', error);
+        debugError('GCal Availability: failed to render calendar', error);
         element.innerHTML = '<div class="gcal-error" style="padding: 20px; background: #fee; border: 1px solid #c33; border-radius: 4px; color: #c33; text-align: center;">' +
             '<div style="font-size: 18px; margin-bottom: 10px;">⚠️</div>' +
             '<div>Failed to initialize calendar.</div>' +

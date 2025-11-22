@@ -1029,7 +1029,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/css/calendar.min.css', __FILE__),
             ['fullcalendar'],
-            '2.5.0'
+            '2.6.0'
         );
 
         wp_enqueue_script(
@@ -1044,7 +1044,7 @@ final class Gcal_Availability {
             'gcal-availability',
             plugins_url('assets/js/calendar.min.js', __FILE__),
             ['fullcalendar'],
-            '2.5.0',
+            '2.6.0',
             true
         );
 
@@ -1064,6 +1064,7 @@ final class Gcal_Availability {
                     'showCtaButton' => $settings['show_cta_button'] ?? false,
                     'ctaButtonText' => $settings['cta_button_text'] ?? '',
                     'ctaButtonUrl' => $settings['cta_button_url'] ?? '',
+                    'enableDebug' => $settings['enable_logging'] ?? false,
                 ],
                 'i18n' => [
                     'loading' => __('Loading calendar...', 'gcal-availability'),
