@@ -525,11 +525,53 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             // Update on view change
-            calendar.on('datesSet', updateCtaButton);
+            calendar.on('datesSet', function() {
+                updateCtaButton();
+                updatePrevButton();
+            });
 
             // Initial update
             updateCtaButton();
         }
+
+        // Function to disable/enable prev button based on current view
+        function updatePrevButton() {
+            var currentDate = calendar.getDate();
+            var today = new Date();
+
+            // Get start of current month
+            var currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+
+            // Get start of viewed month
+            var viewedMonthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+
+            // If somehow navigated to past month, jump back to current month
+            if (viewedMonthStart < currentMonthStart) {
+                debugLog('GCal Availability: preventing navigation to past month, jumping to current month');
+                calendar.gotoDate(today);
+                return;
+            }
+
+            // Disable prev button if viewing current month
+            var prevButton = document.querySelector('.gcal-availability-wrapper .fc-prev-button');
+            if (prevButton) {
+                if (viewedMonthStart <= currentMonthStart) {
+                    prevButton.disabled = true;
+                    prevButton.style.opacity = '0.3';
+                    prevButton.style.cursor = 'not-allowed';
+                } else {
+                    prevButton.disabled = false;
+                    prevButton.style.opacity = '1';
+                    prevButton.style.cursor = 'pointer';
+                }
+            }
+        }
+
+        // Initial update of prev button
+        updatePrevButton();
+
+        // Also update on any date change
+        calendar.on('datesSet', updatePrevButton);
     } catch (error) {
         debugError('GCal Availability: failed to render calendar', error);
         element.innerHTML = '<div class="gcal-error" style="padding: 20px; background: #fee; border: 1px solid #c33; border-radius: 4px; color: #c33; text-align: center;">' +
