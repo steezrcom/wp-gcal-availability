@@ -349,8 +349,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 timeRange: arg.event.extendedProps.timeRange
             });
 
-            // Month view: show dot + time range or "Busy" for all-day
+            // Month view: show dot + time range (no text, just times)
             if (view === 'dayGridMonth') {
+                var timeRange = '';
+                var ariaLabel = '';
+
                 // For midnight-crossing events, show custom time range (e.g., "19:00 - 02:00")
                 if (isMidnightCrossing) {
                     var startTime = arg.event.start;
@@ -364,41 +367,26 @@ document.addEventListener('DOMContentLoaded', function () {
                     var endStr = endTime.getHours().toString().padStart(2, '0') + ':' +
                                  endTime.getMinutes().toString().padStart(2, '0');
 
-                    var timeRange = startStr + ' - ' + endStr;
-
-                    return {
-                        html: '<div class="fc-daygrid-event-dot" style="border-color: ' + arg.borderColor + ';"></div>' +
-                              '<div class="fc-event-time">' + timeRange + '</div>'
-                    };
+                    timeRange = startStr + ' - ' + endStr;
+                    ariaLabel = 'Obsazeno od ' + startStr + ' do ' + endStr;
+                } else {
+                    // For all-day and timed events, use stored time range
+                    timeRange = arg.event.extendedProps.timeRange || '';
+                    ariaLabel = 'Obsazeno ' + timeRange;
                 }
 
-                // For all-day events, show dot + "Obsazeno"
-                if (isAllDay) {
-                    return {
-                        html: '<div class="fc-daygrid-event-dot" style="border-color: ' + arg.borderColor + ';"></div>' +
-                              '<div class="fc-event-time">' + arg.event.extendedProps.timeRange + '</div>'
-                    };
-                }
-
-                // For timed events, show dot + time range
                 return {
                     html: '<div class="fc-daygrid-event-dot" style="border-color: ' + arg.borderColor + ';"></div>' +
-                          '<div class="fc-event-time">' + arg.event.extendedProps.timeRange + '</div>'
+                          '<div class="fc-event-time" aria-label="' + ariaLabel + '">' + timeRange + '</div>'
                 };
             }
 
-            // Week/Day view: for all-day events (now displayed as full-day blocks), show title only
-            if (isAllDay) {
-                return {
-                    html: '<div class="fc-event-title" style="text-align: center; font-weight: bold;">' +
-                          (arg.event.title || '') + '</div>'
-                };
-            }
+            // Week/Day view: show only time range (no text)
+            var timeRange = arg.event.extendedProps.timeRange || arg.timeText || '';
+            var ariaLabel = 'Obsazeno ' + timeRange;
 
-            // Week/Day view: for timed events, show time + title
             return {
-                html: '<div class="fc-event-time">' + arg.timeText + '</div>' +
-                      '<div class="fc-event-title">' + (arg.event.title || '') + '</div>'
+                html: '<div class="fc-event-time" aria-label="' + ariaLabel + '">' + timeRange + '</div>'
             };
         },
 

@@ -465,6 +465,31 @@
     }
 }
 
+/* Extra small phones - prevent text wrapping/breaking */
+@media (max-width: 420px) {
+    /* Reduce event time font size to prevent wrapping */
+    .gcal-availability-wrapper .fc-event-time {
+        font-size: 0.7em !important;
+        line-height: 1.2;
+    }
+
+    /* Smaller font in month view events */
+    .gcal-availability-wrapper .fc-daygrid-dot-event .fc-event-time {
+        font-size: 0.65em !important;
+    }
+
+    /* Reduce time grid slot label size */
+    .gcal-availability-wrapper .fc-timegrid-slot-label {
+        font-size: 0.65em !important;
+    }
+
+    /* Compact day headers */
+    .gcal-availability-wrapper .fc-col-header-cell-cushion {
+        font-size: 0.8em !important;
+        padding: 4px 2px !important;
+    }
+}
+
 /* CTA Button Styling */
 .gcal-availability-wrapper .gcal-cta-container {
     margin-top: 20px;
